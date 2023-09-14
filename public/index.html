@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PorongoChat</title>
+</head>
+<body>
+    <div id="chat_container"></div>
+    <div>
+        <form id="message_form">
+            <input id="message" type="text" placeholder="Message">
+            <input id="username" type="text" placeholder="Username">
+            <input id="submit" type="submit" value="Enviar">
+        </form>
+    </div>
+</body>
+
+<style>
+    body {
+        margin: 5;
+        padding-bottom: 3rem;
+    }
+
+    #chat_container {
+        overflow-y: scroll;
+        height: 90vh;
+    }
+
+    #message_form {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #message {
+        width: 100%;
+        height: 5vh;
+    }
+
+    #username {
+        width: 20%;
+        height: 5vh;
+    }
+
+    #submit {
+        height: 6vh;
+        border-radius: 0;
+    }
+</style>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const message = document.querySelector('#message_form')
+    const container = document.querySelector('#chat_container')
+    const socket = io()
+
+    let ownMsg = []
+
+    const appendData = data => {
+        container.innerHTML += `<p>${data}</p>`
+        container.scrollTop = container.scrollHeight
+    }
+
+    const checkUname = data => {
+        let reg = '/<(.|\n)*?>/g'
+        if(data && data.replace(/\s/g, '').length) {
+            return data
+        }
+        return 'the_nameless'
+    }
+
+    message.addEventListener('submit', event => {
+        event.preventDefault()
+        let data = message.children[0].value
+        if(data && data.replace(/\s/g, '').length) {
+            resUname = checkUname(message.children[1].value)
+            socket.emit('message_send', {name: resUname, data: data})
+            ownMsg.push(data)
+            message.children[0].value = ''
+        }
+    })
+
+    socket
+        .on('user_connect', msg => {
+            appendData(msg)
+        })
+        .on('message_broadcast', msg => {
+            appendData(msg)
+        })
+        .on('user_disconnect', msg => {
+            appendData(msg)
+        })
+
+
+</script>
+
+</html>
