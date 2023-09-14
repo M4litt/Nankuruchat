@@ -1,14 +1,25 @@
 import express from 'express'
 import dotenv from 'dotenv'
+import { userRouter } from './routes/user.router';
+import * as db from './db';
+import { MessageRouter } from './routes/message.router';
+import { channelRouter } from './routes/channel.router';
+import { serverRouter } from './routes/server.router';
 
-const app = express()
-dotenv.config()
+dotenv.config();
 
-app
-    .use(express.json())
-    .get('/', (req, res) => {
-        res.status(200).send('NANKUTURIAS')
-    })
-    .listen(process.env.PORT, () => {
-        console.log(`API hosted on: http://localhost:${process.env.PORT}`)
-    })
+const app = express();
+const PORT = process.env.PORT;
+
+app.use(express.json());
+
+app.listen(PORT, () => {
+    console.log(`NankuruChat-back deployed on http://localhost:${PORT}`);
+});
+
+db.init();
+
+app.use('/user',    userRouter);
+app.use('/message', MessageRouter);
+app.use('/channel', channelRouter);
+app.use('/server',  serverRouter);
