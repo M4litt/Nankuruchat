@@ -46,6 +46,8 @@ export class LinkerChannelMessagesModel {
             )
         });
     }
+    
+    // extras
 
     public static getMessagesByChannel(id_channel:Number): Promise<Message[]> {
         return new Promise((resolve, reject) => {

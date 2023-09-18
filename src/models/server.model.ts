@@ -3,6 +3,8 @@ import { RowDataPacket } from "mysql2";
 import { Server } from "../types/server.type";
 import { Message } from "../types/message.type";
 import { Channel } from "../types/channel.type";
+import { LinkerChannelServerModel } from "./linker_channel_server.model";
+import { ChannelModel } from "./channel.model";
 
 
 export class ServerModel {
@@ -88,43 +90,94 @@ export class ServerModel {
     // extra
 
     // add channel to server
-    public static addChannel(id_server:Number, id_channel:Number):Promise<boolean> {
+    public static addChannel(id_server:Number, channel:Channel):Promise<any> {
         return new Promise((resolve, reject) => {
-            db.query(
-                `INSERT INTO linker_channel_server (id_server, id_channel) VALUES (?, ?)`,
-                [id_server, id_channel],
-                (err, res) => {
-                    if (err) reject(err);
-                    resolve(true);
-                }
-            )
+            ChannelModel.create(channel)
+            .then(data => {
+                LinkerChannelServerModel.create(data.insertId, id_server)
+                .then(data => resolve(data))
+                .catch(err => reject(err))
+            })   
+            .catch(err => reject(err))
+         
         });
     }
 
     // get channels from a server
     public static getChannels(id_server:Number):Promise<Channel[]> {
         return new Promise((resolve, reject) => {
-            db.query(
-                `SELECT * FROM linker_channel_server WHERE id_server = ?`,
-                [id_server],
-                (err, res) => {
-                    if (err) reject(err);
-                    const rows = <RowDataPacket[]> res;
-                    const channel: Channel[] = [];
 
-                    rows.forEach(row => 
-                        channel.push(new Channel(row.id, row.name))
-                    );
-                    resolve(channel)
-                }
-            )
+            ServerModel.getOne(id_server)
+            .then(data => {
+
+                if (data == null) reject('server not found');
+
+                LinkerChannelServerModel.getChannelsByServer(id_server)
+                .then(data => resolve(data))
+                .catch(err => reject(err))
+            })
+            .catch(err => reject(err))
+
+
         });
     }
 
-    // delete channels
-    public static deleteChannel(id_server:Number, id_channel:Number):Promise<boolean> {
+    public static getChannel(id_server:Number, id_channel:Number):Promise<Channel> {
         return new Promise((resolve, reject) => {
             
+            // check if server exists
+            ServerModel.getOne(id_server)
+            .then(data => {
+
+                if (data == null) reject('server not found');
+
+                LinkerChannelServerModel.getChannelByServerAndId(id_channel, id_server)
+                .then(data => resolve(data))
+                .catch(err => reject(err))
+            })
+            .catch(err => reject(err))
+        })
+    }
+
+    public static updateChannel(id_server:Number, id_channel:Number, channel:Channel):Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            ChannelModel.update(id_channel, channel)
+            .then(data => resolve(data))
+            .catch(err => reject(err)) 
+        });
+    }
+
+    public static getMessagesFromChannel(id_server:Number, id_channel:Number):Promise<Message[]> {
+        return new Promise((resolve, reject) => {
+
+            // check server exists
+            LinkerChannelServerModel.getChannelByServerAndId(id_channel, id_server)
+            .then(channel => {
+
+                if (channel == null) reject('channel not found');
+
+                ChannelModel.getMessages(id_channel)
+                .then(data => resolve(data))
+                .catch(err => reject(err))
+            })
+            .catch(err => reject(err))
+        });
+    }
+
+    public static addMessageToChannel(id_server:Number, id_channel:Number, message:Message):Promise<any> 
+    {
+        return new Promise((resolve, reject) => {
+
+            LinkerChannelServerModel.getChannel(id_server, id_channel)
+            .then(channel => {
+                if (channel == null) reject('channel not found');
+
+                ChannelModel.addMessage(id_channel, message)
+                .then(data => resolve(data))
+                .catch(err => reject(err))
+            })
+            .catch(err => reject(err))
+
         });
     }
 

@@ -103,12 +103,40 @@ export class ChannelModel {
     // get one message from channel
     public static getMessage(id_channel:Number, id_message:Number):Promise<Message> 
     {   
-        return LinkerChannelMessagesModel.getMessageByChannelAndId(id_channel, id_message);
+        return new Promise((resolve, reject) => {
+            
+            ChannelModel.getOne(id_channel)
+            .then(data => {
+                
+                if (data == null) reject(`${this.table_name} not found`);
+
+                LinkerChannelMessagesModel.getMessageByChannelAndId(id_channel, id_message)
+                .then(data => resolve(data))
+                .catch(err => reject(err));
+            })
+            .catch(err => reject(err));
+        })
     }
 
     // get all messages from a channel
-    public static getMessages(id_channel:Number):Promise<Message[]> {
-        return LinkerChannelMessagesModel.getMessagesByChannel(id_channel)
+    public static getMessages(id_channel:Number):Promise<Message[]> 
+    {
+        return new Promise((resolve, reject) => {
+            
+            // find if channel exists
+            ChannelModel.getOne(id_channel)
+            .then(data => {
+                
+                // if not exist
+                if (data == null) reject(`${this.table_name} not found`);
+
+                // get all messages from channel
+                LinkerChannelMessagesModel.getMessagesByChannel(id_channel)
+                .then(data => resolve(data))
+                .catch(err => reject(err));
+            })
+            .catch(err => reject(err));
+        })
     }
 
     // add message to channel
@@ -170,7 +198,7 @@ export class ChannelModel {
         return new Promise((resolve, reject) => {
             
             // check if message exists inside channel
-            ChannelModel.getMessage(message.id, id_message)
+            ChannelModel.getMessage(id_channel, id_message)
             .then(data => {
 
                 // update message
