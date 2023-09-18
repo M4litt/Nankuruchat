@@ -12,5 +12,3 @@ MessageRouter.post('/', MessageController.create);
 MessageRouter.patch('/:id', MessageController.update);
 
 MessageRouter.delete('/:id', MessageController.delete);
-
-MessageRouter.get('/dev/lastInsertID', MessageController.getLastInsertID);

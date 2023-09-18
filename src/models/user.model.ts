@@ -43,14 +43,14 @@ export class UserModel {
         });
     }
 
-    public static create(user:User):Promise<boolean> {
+    public static create(user:User):Promise<any> {
         return new Promise((resolve, reject) => {
             db.query(
                 `INSERT INTO ${table_name} (username, pfp, email, password) VALUES (?, ?, ?, ?)`,
                 [user.username, user.pfp, user.email, user.password],
                 (err, res) => {
                     if (err) reject(err);
-                    resolve(true);
+                    resolve(res);
                 }
             )
         });

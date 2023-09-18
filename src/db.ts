@@ -13,7 +13,13 @@ export const db = mysql.createConnection(
 );
 
 export function init() {
-    db.query("SHOW TABLES");    // test query
+    db.query(
+        "SHOW TABLES",
+        (err, res) => {
+            if (err) throw err;
+            //console.log(res);
+        }
+    );    // test query
     
     //console.log(`Succesfully connected to MySQL`)
     //console.log(`User: '${process.env.DB_USER}'@'${process.env.DB_HOST}`)

@@ -4,14 +4,15 @@ import { Server } from "../types/server.type";
 import { Message } from "../types/message.type";
 import { Channel } from "../types/channel.type";
 
-const table_name = 'server';
 
 export class ServerModel {
+
+    public static table_name = 'server';
     
     public static getAll():Promise<Server[]> {
         return new Promise((resolve, reject) => {
             db.query(
-                `SELECT * FROM ${table_name}`,
+                `SELECT * FROM ${this.table_name}`,
                 (err, res) => {
                     if (err) reject(err);
                     const rows = <RowDataPacket[]> res;
@@ -29,7 +30,7 @@ export class ServerModel {
     public static getOne(id:Number):Promise<Server> {
         return new Promise((resolve, reject) => {
             db.query(
-                `SELECT * FROM ${table_name} WHERE id = ?`,
+                `SELECT * FROM ${this.table_name} WHERE id = ?`,
                 [id],
                 (err, res) => {
                     if (err) reject(err);
@@ -38,21 +39,21 @@ export class ServerModel {
                         const server = new Server(row.id, row.name, row.description, row.picture);
                         resolve(server);
                     } catch(error) {
-                        reject(`${table_name} not found`)
+                        reject(`${this.table_name} not found`)
                     }
                 }
             )
         });
     }
 
-    public static create(server:Server):Promise<boolean> {
+    public static create(server:Server):Promise<any> {
         return new Promise((resolve, reject) => {
             db.query(
-                `INSERT INTO ${table_name} (name, description, picture) VALUES (?, ?, ?)`,
+                `INSERT INTO ${this.table_name} (name, description, picture) VALUES (?, ?, ?)`,
                 [server.name, server.description, server.picture],
                 (err, res) => {
                     if (err) reject(err);
-                    resolve(true);
+                    resolve(res);
                 }
             )
         });
@@ -61,7 +62,7 @@ export class ServerModel {
     public static update(id:Number, server:Server):Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.query(
-                `UPDATE ${table_name} SET name = ?, description = ?, picture = ? WHERE id = ?`,
+                `UPDATE ${this.table_name} SET name = ?, description = ?, picture = ? WHERE id = ?`,
                 [server.name, server.description, server.picture, id],
                 (err, res) => {
                     if (err) reject(err);
@@ -74,7 +75,7 @@ export class ServerModel {
     public static delete(id:Number):Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.query(
-                `DELETE FROM ${table_name} WHERE id = ?`,
+                `DELETE FROM ${this.table_name} WHERE id = ?`,
                 [id],
                 (err, res) => {
                     if (err) reject(err);

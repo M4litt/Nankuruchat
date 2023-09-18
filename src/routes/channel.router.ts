@@ -17,7 +17,11 @@ channelRouter.delete('/:id', ChannelController.delete);
 
 channelRouter.get('/:id/messages', ChannelController.getMessages);
 
+channelRouter.get('/:id/messages/:id_message', ChannelController.getMessage);
+
 channelRouter.post('/:id/messages', ChannelController.addMessage);
+
+channelRouter.patch('/:id/messages/:id_message', ChannelController.updateMessage);
 
 channelRouter.delete('/:id/messages/:id_message', ChannelController.deleteMessage);
 
