@@ -4,6 +4,7 @@
 ### TODO
 - linker user server
 - añadir descripcion al usuario
+- Cosas con X
 
 ### DONE
 - User
@@ -24,10 +25,10 @@
     - add channel
     - get messages from channel
     - add message to channel
-    X patch message
-    X patch channel
-    X delete message
-    X delete channel
+    - X patch message
+    - X patch channel
+    - X delete message
+    - X delete channel
 
 - Channel
     - get all
