@@ -1,5 +1,5 @@
 # Nankuruback
-- by Kali <{@}>
+by Kali <{@}>
 
 ### TODO
 - linker user server
