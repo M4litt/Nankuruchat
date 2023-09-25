@@ -1,10 +1,10 @@
-import express from 'express'
+import express, { Request, Response } from 'express'
 import dotenv from 'dotenv'
-import { userRouter } from './routes/user.router';
 import * as db from './db';
+import { userRouter }    from './routes/user.router';
 import { MessageRouter } from './routes/message.router';
 import { channelRouter } from './routes/channel.router';
-import { serverRouter } from './routes/server.router';
+import { serverRouter }  from './routes/server.router';
 
 dotenv.config();
 
@@ -19,6 +19,7 @@ app.listen(PORT, () => {
 
 db.init();
 
+app.get('/', (req:Request, res:Response) => res.status(200).send('NankuruBack is awaken <👁>'));
 app.use('/user',    userRouter);
 app.use('/message', MessageRouter);
 app.use('/channel', channelRouter);
