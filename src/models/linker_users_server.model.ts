@@ -1,14 +1,17 @@
+import { RowDataPacket } from "mysql2";
 import { db } from "../db";
-
-const table_name = "linker_users_server";
+import { User } from "../types/user.type";
+import { UserModel } from "./user.model";
 
 export class LinkerUsersServerModel {
+
+    public static table_name = "linker_users_server";
     
     public static create(id_user:Number, id_server:Number): Promise<any> 
     {
         return new Promise((resolve, reject) => {
             db.query(
-                `INSERT INTO ${table_name} (id_user, id_server) VALUES (?, ?)`,
+                `INSERT INTO ${this.table_name} (id_user, id_server) VALUES (?, ?)`,
                 [id_user, id_server],
                 (err, res) => {
                     if (err) reject(err);
@@ -22,7 +25,7 @@ export class LinkerUsersServerModel {
     {
         return new Promise((resolve, reject) => {
             db.query(
-                `DELETE FROM ${table_name} WHERE id_user = ?`,
+                `DELETE FROM ${this.table_name} WHERE id_user = ?`,
                 [id_user],
                 (err, res) => {
                     if (err) reject(err);
@@ -36,11 +39,85 @@ export class LinkerUsersServerModel {
     {
         return new Promise((resolve, reject) => {
             db.query(
-                `DELETE FROM ${table_name} WHERE id_server = ?`,
+                `DELETE FROM ${this.table_name} WHERE id_server = ?`,
                 [id_server],
                 (err, res) => {
                     if (err) reject(err);
                     resolve(res);
+                }
+            )
+        });
+    }
+
+    public static getUsersByServer(id_server:Number): Promise<User[]>
+    {
+        return new Promise((resolve, reject) => {
+            db.query(
+                `SELECT * FROM ${UserModel.table_name} WHERE id IN (SELECT id_user FROM ${this.table_name} WHERE id_server = ?)`,
+                [id_server],
+                (err, res) => {
+                    if (err) reject(err);
+                    const rows = <RowDataPacket[]> res;
+                    const users:User[] = [];
+
+                    rows.forEach(row => 
+                        users.push(new User(row.id, row.username, row.pfp, row.email, row.password, row.description))
+                    );
+                    resolve(users)
+                }
+            )
+        });
+    }
+
+    public static getUserByServerAndId(id_server:Number, id_user:Number): Promise<User>
+    {
+        return new Promise((resolve, reject) => {
+            db.query(
+                `SELECT * FROM ${UserModel.table_name} WHERE id = ? AND id IN (SELECT id_user FROM ${this.table_name} WHERE id_server = ?)`,
+                [id_user, id_server],
+                (err, res) => {
+                    if (err) reject(err);
+                    const row  = (<RowDataPacket> res)[0];
+                    try {
+                        const user = new User(row.id, row.username, row.pfp, row.email, row.password, row.description);
+                        resolve(user);
+                    } catch(error) {
+                        reject(`${this.table_name} not found`)
+                    }
+                }
+            )
+        });
+    }
+
+    public static addUserToServer(id_user:Number, id_server:Number): Promise<any>
+    {
+        return new Promise((resolve, reject) => {
+            db.query(
+                `INSERT INTO ${this.table_name} (id_user, id_server) VALUES (?, ?)`,
+                [id_user, id_server],
+                (err, res) => {
+                    if (err) reject(err);
+                    resolve(res);
+                }
+            )
+        })
+    }
+
+    public static removeUser(id_user:Number, id_server:Number): Promise<User>
+    {
+        return new Promise((resolve, reject) => {
+            db.query(
+                `DELETE FROM ${this.table_name} WHERE id_user = ? AND id_server = ?`,
+                [id_user, id_server],
+                (err, res) => {
+                    if (err) reject(err);
+                    try {
+                        const row = (<RowDataPacket> res)[0];
+                        const user = new User(row.id, row.username, row.pfp, row.email, row.password, row.description);
+                        resolve(user);
+                    } catch(error) {
+                        reject(`${this.table_name} not found`)
+                    }
                 }
             )
         });

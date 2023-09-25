@@ -157,13 +157,17 @@ export class ChannelModel {
     }
 
     // delete message from channel
-    public static deleteMessage(id_message:Number):Promise<boolean> {
+    public static deleteMessage(id_channel:Number, id_message:Number):Promise<boolean> {
         return new Promise((resolve, reject) => {
-            
-            // delete message
-            MessageModel.delete(id_message)
-            .then(data => resolve(true))
-            .catch(err => reject(err));
+            LinkerChannelMessagesModel.getMessageByChannelAndId(id_channel, id_message)
+            .then(data => {
+                if (!data) reject('message not found');
+                // delete message
+                MessageModel.delete(id_message)
+                .then(data => resolve(true))
+                .catch(err => reject(err));
+            })
+          
         });
     }
 

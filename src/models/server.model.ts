@@ -139,6 +139,22 @@ export class ServerModel {
         })
     }
 
+    public static deleteChannel(id_server:Number, id_channel:Number):Promise<any>
+    {
+        return new Promise((resolve, reject) => {
+            LinkerChannelServerModel.getChannelByServerAndId(id_channel, id_server)
+            .then(channel => {
+                
+                if (!channel) reject('channel not found aaa');
+
+                ChannelModel.delete(id_channel)
+                .then(data => resolve(data))
+                .catch(err => reject(err))
+            })
+            .catch(err => reject(err))
+        });
+    }
+
     public static updateChannel(id_server:Number, id_channel:Number, channel:Channel):Promise<boolean> {
         return new Promise((resolve, reject) => {
             ChannelModel.update(id_channel, channel)
@@ -178,6 +194,45 @@ export class ServerModel {
             })
             .catch(err => reject(err))
 
+        });
+    }
+
+    public static getMessageFromChannelById(id_server:Number, id_channel:Number, id_message:Number):Promise<any>
+    {
+        return new Promise((resolve, reject) => {
+            this.getChannel(id_server, id_channel)
+            .then(channel => {
+                if (!channel) reject('channel not found');
+
+                ChannelModel.getMessage(id_channel, id_message)
+                .then(data => resolve(data))
+                .catch(err => reject(err))
+            })
+            .catch(err => reject(err))
+        })
+    }
+
+    public static deleteMessageFromChannel(id_server:Number, id_channel:Number, id_message:Number):Promise<any> 
+    {
+        return new Promise((resolve, reject) => {
+            this.getChannel(id_server, id_channel)
+            .then(channel => {
+                if (!channel) reject('channel not found');
+
+                ChannelModel.deleteMessage(id_channel, id_message)
+                .then(data => resolve(data))
+                .catch(err => reject(err))
+            })
+            .catch(err => reject(err))
+        })
+    }
+
+    public static updateMessageFromChannel(id_server:Number, id_channel:Number, id_message:Number, message:Message): Promise<any> 
+    {
+        return new Promise((resolve, reject) => {
+            ChannelModel.updateMessage(id_channel, id_message, message)
+            .then(data => resolve(data))
+            .catch(err => reject(err))
         });
     }
 

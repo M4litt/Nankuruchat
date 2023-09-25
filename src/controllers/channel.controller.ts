@@ -105,13 +105,14 @@ export class ChannelController {
 
     public static deleteMessage(req:Request, res:Response) {
         const id_message = Number(req.params.id_message);
+        const id_channel = Number(req.params.id);
 
         if (isNaN(id_message)) {
             res.status(400).json({'message': 'id must be a number'});
             return;
         }
 
-        ChannelModel.deleteMessage(id_message)
+        ChannelModel.deleteMessage(id_channel, id_message)
         .then(data => res.status(200).json(data))
         .catch(err => res.status(400).json({'message': err}))
     }

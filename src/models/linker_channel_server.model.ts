@@ -120,7 +120,7 @@ export class LinkerChannelServerModel {
                     } 
                     catch(error) 
                     {
-                        reject(`channel casa de villa rosa not found`)
+                        reject(`channel not found`)
                     }
                 }
             )

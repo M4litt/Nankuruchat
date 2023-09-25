@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { ServerModel } from "../models/server.model";
 import { Channel } from "../types/channel.type";
+import { LinkerUsersServerModel } from "../models/linker_users_server.model";
+import { UserModel } from "../models/user.model";
+import { LinkerChannelServerModel } from "../models/linker_channel_server.model";
+import { ChannelModel } from "../models/channel.model";
 
 export class ServerController {
     public static getAll(req:Request, res:Response) {
@@ -56,6 +60,8 @@ export class ServerController {
         .catch(err => res.status(400).json({'message': err}))
     }
     
+    // channels
+
     public static addChannel(req: Request, res:Response) {
         const id_server = Number(req.params.id_server);
         const channel:Channel = req.body;
@@ -107,7 +113,36 @@ export class ServerController {
             return;
         }
 
+        ServerModel.getOne(id_server)
+        .then(data => {
+
+            if (!data) {
+                res.status(404).json({'message': 'server not found'});
+                return;
+            }
+
+            ServerModel.updateChannel(id_server, id_channel, channel)
+            .then(data => res.status(200).json(data))
+            .catch(err => res.status(400).json({'message': err}))
+        })
+        .catch(err => res.status(400).json({'message': err}))
     }
+
+    public static deleteChannel(req:Request, res:Response) {
+        const id_server = Number(req.params.id_server);
+        const id_channel = Number(req.params.id_channel);
+
+        if (isNaN(id_server) || isNaN(id_channel)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+        
+        ServerModel.deleteChannel(id_server, id_channel)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
+    }
+
+    // messages
 
     public static getMessages(req: Request, res: Response) {
         const id_server = Number(req.params.id_server);
@@ -134,6 +169,161 @@ export class ServerController {
         }
 
         ServerModel.addMessageToChannel(id_server, id_channel, message)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
+    }
+
+    public static getMessageById(req:Request, res:Response) {
+        const id_channel = Number(req.params.id_channel);
+        const id_server = Number(req.params.id_server);
+        const id_message = Number(req.params.id_message);
+
+        if (isNaN(id_server) || isNaN(id_channel) || isNaN(id_message)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        ServerModel.getMessageFromChannelById(id_server, id_channel, id_message)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
+    }
+
+    public static deleteMessage(req:Request, res:Response) {
+        const id_channel = Number(req.params.id_channel);
+        const id_server = Number(req.params.id_server);
+        const id_message = Number(req.params.id_message);
+
+        if (isNaN(id_server) || isNaN(id_channel) || isNaN(id_message)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        ServerModel.getMessageFromChannelById(id_server, id_channel, id_message)
+        .then(data => {
+            if (!data) {
+                res.status(404).json({'message': 'message not found'});
+                return;
+            }
+
+            ServerModel.deleteMessageFromChannel(id_server, id_channel, id_message)
+            .then(data => res.status(200).json(data))
+            .catch(err => res.status(400).json({'message': err}))
+        })
+        .catch(err => res.status(400).json({'message': err}))
+    }
+    
+    public static updateMessage(req:Request, res:Response) {
+        const id_channel = Number(req.params.id_channel);
+        const id_server = Number(req.params.id_server);
+        const id_message = Number(req.params.id_message);
+        const message = req.body;
+
+        if (isNaN(id_server) || isNaN(id_channel) || isNaN(id_message)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        ServerModel.getMessageFromChannelById(id_server, id_channel, id_message)
+        .then(data => {
+            if (!data) {
+                res.status(404).json({'message': 'message not found'});
+                return;
+            }
+
+            ServerModel.updateMessageFromChannel(id_server, id_channel, id_message, message)
+            .then(data => res.status(200).json(data))
+            .catch(err => res.status(400).json({'message': err}))
+        })
+    }
+
+    // users
+
+    public static getUsers(req:Request, res:Response)
+    {
+        const id = Number(req.params.id_server);
+
+        if (isNaN(id)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        ServerModel.getOne(id)
+        .then(data => {
+
+            if (!data) {
+                res.status(404).json({'message': 'server not found'});
+                return;
+            }
+
+            LinkerUsersServerModel.getUsersByServer(id)
+            .then(data => res.status(200).json(data))
+            .catch(err => res.status(400).json({'message': err}))
+        })
+        .catch(err => res.status(400).json({'message': err}))
+
+    }
+
+    public static getUserById(req:Request, res:Response)
+    {
+        const id_user = Number(req.params.id_user);
+        const id_server = Number(req.params.id_server);
+
+        if (isNaN(id_user) || isNaN(id_server)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        ServerModel.getOne(id_server)
+        .then(data => {
+
+            if (!data) {
+                res.status(404).json({'message': 'server not found'});
+                return;
+            }
+
+            LinkerUsersServerModel.getUserByServerAndId(id_server, id_user)
+            .then(data => res.status(200).json(data))
+            .catch(err => res.status(400).json({'message': err}))
+        })
+
+    }
+
+    public static addUser(req:Request, res:Response) 
+    {
+        const user_id = Number(req.params.id_user);
+        const server_id = Number(req.params.id_server);
+
+        UserModel.getOne(user_id)
+        .then(data => {
+
+            if (!data) {
+                res.status(404).json({'message': 'user not found'});
+                return;
+            }
+
+            ServerModel.getOne(server_id)
+            .then(data => {
+
+                if (!data) {
+                    res.status(404).json({'message': 'server not found'});
+                    return;
+                }
+
+                LinkerUsersServerModel.addUserToServer(user_id, server_id)
+                .then(data => res.status(200).json(data))
+                .catch(err => res.status(400).json({'message': err}))
+            })
+
+        })
+        .catch(err => res.status(400).json({'message': err}))
+    }
+
+    public static removeUser(req:Request, res:Response) 
+    {
+        const user_id = Number(req.params.id_user);
+        const server_id = Number(req.params.id_server);
+
+        LinkerUsersServerModel.removeUser(user_id, server_id)
         .then(data => res.status(200).json(data))
         .catch(err => res.status(400).json({'message': err}))
     }

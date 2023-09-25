@@ -13,6 +13,7 @@ export const db = mysql.createConnection(
 );
 
 export function init() {
+    // test query
     db.query(
         "SHOW TABLES",
         (err, res) => {

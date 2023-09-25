@@ -1,10 +1,5 @@
 # Nankuruback
-by Kali <{@}>
-
-### TODO
-- linker user server
-- añadir descripcion al usuario
-- Cosas con X
+- by Kali <{@}>
 
 ### DONE
 - User
@@ -25,10 +20,14 @@ by Kali <{@}>
     - add channel
     - get messages from channel
     - add message to channel
-    - X patch message
-    - X patch channel
-    - X delete message
-    - X delete channel
+    - patch message
+    - patch channel
+    - delete message
+    - delete channel
+    - get users
+    - get user by id
+    - add user
+    - remove user
 
 - Channel
     - get all

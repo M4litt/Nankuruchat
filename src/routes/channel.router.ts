@@ -3,6 +3,8 @@ import { ChannelController } from '../controllers/channel.controller';
 
 export const channelRouter = express.Router();
 
+// channel // ------------------------------------------------------------------------------------------
+
 channelRouter.get('/', ChannelController.getAll);
 
 channelRouter.get('/:id', ChannelController.getOne);
@@ -13,7 +15,7 @@ channelRouter.patch('/:id', ChannelController.update);
 
 channelRouter.delete('/:id', ChannelController.delete);
 
-// extras
+// message // ------------------------------------------------------------------------------------------
 
 channelRouter.get('/:id/messages', ChannelController.getMessages);
 

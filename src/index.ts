@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express'
 import dotenv from 'dotenv'
 import * as db from './db';
+
+// routes
 import { userRouter }    from './routes/user.router';
 import { MessageRouter } from './routes/message.router';
 import { channelRouter } from './routes/channel.router';
