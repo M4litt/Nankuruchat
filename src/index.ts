@@ -8,6 +8,9 @@ import { MessageRouter } from './routes/message.router';
 import { channelRouter } from './routes/channel.router';
 import { serverRouter }  from './routes/server.router';
 
+// auth
+import { auth } from './middleware/auth.middleware';
+
 dotenv.config();
 
 const app = express();
@@ -23,6 +26,6 @@ db.init();
 
 app.get('/', (req:Request, res:Response) => res.status(200).send('NankuruBack is awaken <👁>'));
 app.use('/user',    userRouter);
-app.use('/message', MessageRouter);
-app.use('/channel', channelRouter);
-app.use('/server',  serverRouter);
+app.use('/message', auth, MessageRouter);
+app.use('/channel', auth, channelRouter);
+app.use('/server',  auth, serverRouter);
