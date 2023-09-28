@@ -24,7 +24,7 @@ export class UserModel {
         });
     }
 
-    public static getOne(id:Number):Promise<User> {
+    public static getOne(id:Number):Promise<User | null> {
         return new Promise((resolve, reject) => {
             db.query(
                 `SELECT * FROM ${this.table_name} WHERE id = ?`,
@@ -85,6 +85,33 @@ export class UserModel {
                 (err, res) => {
                     if (err) reject(err)
                     resolve(true)
+                }
+            )
+        });
+    }
+
+    public static getByEmail(email:string | String):Promise<User | null> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                `SELECT * FROM ${this.table_name} WHERE email = ?`,
+                [email],
+                (err, res) => {
+                    if (err) reject(err);
+                    const row  = (<RowDataPacket> res)[0];
+                    try {
+                        const user = new User
+                        (
+                            row.id, 
+                            row.username, 
+                            row.pfp, 
+                            row.email, 
+                            row.password, 
+                            row.description
+                        );
+                        resolve(user);
+                    } catch(error) {
+                        resolve(null)
+                    }
                 }
             )
         });

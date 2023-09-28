@@ -6,9 +6,9 @@ USE `nankuruchat`;
 CREATE TABLE `nankuruchat`.`user` (
     `id`          INT NOT NULL AUTO_INCREMENT,
     `username`    VARCHAR(50)  NOT NULL,
-    `pfp`         VARCHAR(500) NOT NULL,   -- base 64
+    `pfp`         VARCHAR(1024)NOT NULL,   -- base 64
     `email`       VARCHAR(50)  NOT NULL,
-    `password`    VARCHAR(50)  NOT NULL,   -- hashed
+    `password`    VARCHAR(64)  NOT NULL,   -- hashed
     `description` VARCHAR(500) NOT NULL
     PRIMARY KEY(id)
 );

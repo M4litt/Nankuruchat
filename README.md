@@ -5,9 +5,11 @@
 - User
     - get all
     - get by id
-    - add
+    - add [DEPRECATED - USE REGISTER]
     - delete
     - patch
+    - register
+    - login
 
 - Server
     - get all
