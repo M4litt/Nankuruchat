@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PORONCHAT REBORN</title>
+    <title>Chat Test</title>
 </head>
 <body>
     <form id="form">
@@ -68,6 +68,10 @@
 
     let ownName = ''
 
+    const sendSignal = msg => {
+        ws.send(JSON.stringify(msg))
+    }
+
     const appendData = data => {
         container.innerHTML += `<p>${data}</p>`
         container.scrollTop = container.scrollHeight
@@ -85,7 +89,7 @@
         event.preventDefault()
         let data = message.children[0].value
         if(data && data.replace(/\s/g, '').length) {
-            ws.send(JSON.stringify({type: 'msg', content: data}))
+            sendSignal({type: 'msg', content: data})
             appendData(`${ownName}: ${data}`)
             message.children[0].value = ''
         }
@@ -94,17 +98,26 @@
     form.addEventListener('submit', e => {
         e.preventDefault()
         ownName = form.children[0].value
-        ws.send(JSON.stringify({type: 'login', name: form.children[0].value}))
+        sendSignal({type: 'login', name: checkUname(form.children[0].value)})
     })
 
     ws.addEventListener('message', msg => {
         const data = JSON.parse(msg.data)
-        if(data.success) {
-            form.hidden = true
-            app.hidden = false
+    
+        switch(data.type) {
+            case 'login':
+                if(data.success) {
+                    form.hidden = true
+                    app.hidden = false
+                } else {
+                    alert('Username already taken!')
+                }
+            break
+
+            case 'message':
+                appendData(`${data.name}: ${data.content}`)
+            break
         }
-        else if(data.failed) { alert('Username already taken!') }
-        else { appendData(`${data.name}: ${data.content}`) }
     })
 
 

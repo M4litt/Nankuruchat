@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VC Test</title>
+</head>
+<body>
+    
+    <form id="form">
+        <input type="text" placeholder="Username" autocomplete="off">
+        <input type="submit" value="Login">
+    </form>
+
+    <div id="app" hidden>
+        <div id="vc-container">
+            <div>
+                <h1 id="user-name">You</h1>
+                <button id="mute-self" disabled>Mute</button>
+            </div>
+            
+            <div style="padding-left: 10vh;">
+                <h1>Them</h1>
+                <audio id="off-audio" autoplay></audio>
+                <button id="mute-them" disabled>Mute</button>
+            </div>
+        </div>
+    
+        <br>
+    
+        <button id="enable-mic">Enable Microphone</button>
+        <form id="call-form">
+            <input type="text" id="target" placeholder="User to call" autocomplete="off">
+            <input type="submit" value="call" disabled>
+        </form>
+        <br>
+        <button id="hang-up">HangUp</button>
+    </div>
+
+</body>
+
+<style>
+    #vc-container {
+        display: flex;
+    }
+</style>
+
+<script>
+    const username = document.querySelector('#user-name')
+    const loginForm = document.querySelector('#form')
+    const app = document.querySelector('#app')
+    const callForm = document.querySelector('#call-form')
+    const enableMic = document.querySelector('#enable-mic')
+    const offAudio = document.querySelector('#off-audio')
+    const muteSelf = document.querySelector('#mute-self')
+    const muteThem = document.querySelector('#mute-them')
+    const hangUp = document.querySelector('#hang-up')
+
+    const ws = new WebSocket('ws://172.16.255.220:4356')
+
+    const sendSignal = msg => {
+        ws.send(JSON.stringify(msg))
+    }
+
+    const STUN_servers = {
+        iceServers: [
+            {
+                urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
+            },
+        ],
+        iceCandidatePoolSize: 10,
+    }
+
+    const pc = new RTCPeerConnection(STUN_servers)
+    var peer = null
+    let localStream = null
+    let offStream = null
+
+    // Enable stream pulling from mic
+    enableMic.addEventListener('click', async e => {
+        e.preventDefault()
+        localStream = await navigator.mediaDevices.getUserMedia({video: false, audio: true})
+        offStream = new MediaStream()
+
+        localStream.getTracks().forEach(track => {
+            pc.addTrack(track, localStream)
+        });
+
+        pc.ontrack = e => {
+            e.streams[0].getTracks().forEach(track => {
+                offStream.addTrack(track)
+            })
+        }
+
+        offAudio.src = offStream
+
+        muteSelf.disabled = false
+        muteThem.disabled = false
+        enableMic.disabled = true
+        callForm.children[1].disabled = false
+    })
+
+
+    // LOGIN
+
+    form.addEventListener('submit', e => {
+        e.preventDefault()
+        ownName = form.children[0].value
+        username.textContent = ownName
+        sendSignal({type: 'login', name: form.children[0].value})
+    })
+
+    ws.addEventListener('message', msg => {
+        const data = JSON.parse(msg.data)
+        switch(data.type) {
+            case 'login':
+                if(data.success) {
+                    form.hidden = true
+                    app.hidden = false
+                } else {
+                    alert('Username already taken!')
+                }
+            break
+
+            case "offer": 
+                handleOffer(data.offer)
+            break
+            
+            case "answer": 
+               handleAnswer(data.answer)
+            break
+            
+            //when a remote peer sends an ice candidate to us 
+            case "candidate": 
+               handleCandidate(data.candidate)
+            break
+            
+            case "leave": 
+               handleLeave()
+            break
+            
+            default: 
+               break
+        }})
+
+    hangUp.addEventListener("click", function () { 
+        sendSignal({ 
+            type: "leave",
+            target: peer
+        })
+	
+        handleLeave()
+    })
+
+    callForm.addEventListener('submit', e => {
+        e.preventDefault()
+        const targetName = callForm.children[0].value
+        
+        if(targetName.length == 0){
+            alert('Invalid name')
+            return
+        }
+
+        pc.createOffer(offer => {
+            peer = targetName
+            sendSignal({
+                type: 'offer',
+                target: targetName,
+                offer: offer
+            })
+
+            pc.setLocalDescription(offer)
+            console.log('Sent offer')
+        })
+    })
+
+    const handleOffer = offer => {
+        pc.setRemoteDescription(new RTCSessionDescription(offer))
+
+        pc.createAnswer(answer => {
+            peer = offer.name
+            pc.setLocalDescription(answer)
+            sendSignal({
+                type: 'answer',
+                target: peer,
+                answer: answer
+            })
+            console.log('Received offer, sent answer')
+        })
+    }
+
+    const handleAnswer = answer => {
+        pc.setRemoteDescription(new RTCSessionDescription(answer))
+        console.log('Received answer')
+    }
+
+    const handleICECandidate = candidate => {
+        pc.addIceCandidate(new RTCIceCandidate(candidate))
+    }
+
+    const handleLeave = () => {
+        peer = null
+        offAudio.src = null 
+        
+        pc.onicecandidate = null 
+        pc.onaddstream = null
+        pc = new RTCPeerConnection(STUN_servers)
+    }
+</script>
+
+</html>
