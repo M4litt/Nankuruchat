@@ -4,6 +4,9 @@ import { User } from "../types/user.type";
 import { createHash } from "node:crypto";
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import { FriendsModel } from "../models/friends.model";
+import { EnemiesModel } from "../models/enemies.model";
+import { BlockedModel } from "../models/blocked.model";
 
 dotenv.config()
 
@@ -124,8 +127,8 @@ export class UserController {
         })
         .catch(err => res.status(400).json({'message': err}))
     }
-    
-    private static isPasswordValid(password:string) 
+
+    private static isPasswordValid(password:string):boolean
     {
         return true;
         /*
@@ -160,6 +163,213 @@ export class UserController {
                 expiresIn: '1h'
             }
         )
+    }
+
+    // friends
+    public static getFriends(req:Request, res:Response) {
+        const id = Number(req.params.id);
+
+        if (isNaN(id)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        FriendsModel.getFriends(id)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
+    }
+    public static addFriend(req:Request, res:Response) {
+        const id = Number(req.params.id);
+        const friend_id = Number(req.params.friend_id);
+
+        if (isNaN(id) || isNaN(friend_id)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        if (id == friend_id) {
+            res.status(400).json({'message': 'you cannot add yourself as a friend'});
+            return;
+        }
+
+        UserModel.getOne(id)
+        .then(data => {
+            
+            // if user not found
+            if (!data) {
+                res.status(400).json({'message': 'user not found'});
+                return;
+            }
+
+            UserModel.getOne(friend_id)
+            .then(data => {
+
+                // if to-be-friended user not found
+                if (!data) {
+                    res.status(400).json({'message': 'to-be-friended user not found'});
+                    return;
+                }
+
+                FriendsModel.addFriend(id, friend_id)
+                .then(data => res.status(200).json(data))
+                .catch(err => res.status(400).json({'message': err}))
+            })
+            .catch(err => res.status(400).json({'message': err}))
+        })
+        .catch(err => res.status(400).json({'message': err}))
+    }
+    public static removeFriend(req:Request, res:Response) {
+        const id = Number(req.params.id);
+        const friend_id = Number(req.params.friend_id);
+
+        if (isNaN(id) || isNaN(friend_id)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        FriendsModel.removeFriend(id, friend_id)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
+    }
+
+    // enemies
+    public static getEnemies(req:Request, res:Response) {
+        const id = Number(req.params.id);
+
+        if (isNaN(id)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        EnemiesModel.getEnemies(id)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
+    }
+    public static addEnemy(req:Request, res:Response) {
+        const id = Number(req.params.id);
+        const enemy_id = Number(req.params.enemy_id);
+
+        if (isNaN(id) || isNaN(enemy_id)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        if (id == enemy_id) {
+            res.status(400).json({'message': 'you cannot add yourself as an enemy'});
+            return;
+        }
+
+        UserModel.getOne(id)
+        .then(data => {
+            
+            // if user not found
+            if (!data) {
+                res.status(400).json({'message': 'user not found'});
+                return;
+            }
+
+            UserModel.getOne(enemy_id)
+            .then(data => {
+
+                // if to-be-enemied user not found
+                if (!data) {
+                    res.status(400).json({'message': 'to-be-enemied user not found'});
+                    return;
+                }
+
+                EnemiesModel.addEnemy(id, enemy_id)
+                .then(data => res.status(200).json(data))
+                .catch(err => res.status(400).json({'message': err}))
+            })
+            .catch(err => res.status(400).json({'message': err}))
+        })
+        .catch(err => res.status(400).json({'message': err}))
+
+    }
+    public static removeEnemy(req:Request, res:Response) 
+    {
+        const id = Number(req.params.id);
+        const enemy_id = Number(req.params.enemy_id);
+
+        if (isNaN(id) || isNaN(enemy_id)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        EnemiesModel.removeEnemy(id, enemy_id)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
+    }
+
+    // blocked
+    public static getBlockedUsers(req:Request, res:Response) 
+    {
+        const id = Number(req.params.id);
+
+        if (isNaN(id)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        BlockedModel.getBlockedUsers(id)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
+    }
+    public static blockUser(req:Request, res:Response) 
+    {
+        const id = Number(req.params.id);
+        const blocked_id = Number(req.params.blocked_id);
+
+        if (isNaN(id) || isNaN(blocked_id)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        if (id == blocked_id) { 
+            res.status(400).json({'message': 'you cannot block yourself'});
+            return;
+        }
+
+        UserModel.getOne(id)
+        .then(data => {
+            
+            // if user not found
+            if (!data) {
+                res.status(400).json({'message': 'user not found'});
+                return;
+            }
+
+            UserModel.getOne(blocked_id)
+            .then(data => {
+
+                // if to-be-blocked user not found
+                if (!data) {
+                    res.status(400).json({'message': 'to-be-blocked user not found'});
+                    return;
+                }
+
+                // block user
+                BlockedModel.blockUser(id, blocked_id)
+                .then(data => res.status(200).json(data))
+                .catch(err => res.status(400).json({'message': err}))
+            })
+            .catch(err => res.status(400).json({'message': err}))
+        })
+        .catch(err => res.status(400).json({'message': err}))
+    }
+    public static unblockUser(req:Request, res:Response) 
+    {
+        const id = Number(req.params.id);
+        const blocked_id = Number(req.params.blocked_id);
+
+        if (isNaN(id) || isNaN(blocked_id)) {
+            res.status(400).json({'message': 'id must be a number'});
+            return;
+        }
+
+        BlockedModel.unblockUser(id, blocked_id)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
     }
     
 }

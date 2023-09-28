@@ -1,6 +1,9 @@
 import { RowDataPacket } from "mysql2";
 import { db } from "../db";
 import { User } from "../types/user.type";
+import { BlockedModel } from "./blocked.model";
+import { FriendsModel } from "./friends.model";
+import { EnemiesModel } from "./enemies.model";
 
 export class UserModel {
 
@@ -79,14 +82,18 @@ export class UserModel {
 
     public static delete(id:Number):Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.query(
-                `DELETE FROM ${this.table_name} WHERE id = ?`,
-                [id],
-                (err, res) => {
-                    if (err) reject(err)
-                    resolve(true)
-                }
-            )
+            UserModel.deleteLinkers(id)
+            .then(() => {
+                db.query(
+                    `DELETE FROM ${this.table_name} WHERE id = ?`,
+                    [id],
+                    (err, res) => {
+                        if (err) reject(err)
+                        resolve(true)
+                    }
+                )
+            })
+            .catch(err => reject(err))
         });
     }
 
@@ -114,6 +121,23 @@ export class UserModel {
                     }
                 }
             )
+        });
+    }
+
+    private static deleteLinkers(id:Number):Promise <any> 
+    {
+        return new Promise(async(resolve, reject) => {
+            BlockedModel.delete(id)
+            .then(() => {
+                FriendsModel.delete(id)
+                .then(() => {
+                    EnemiesModel.delete(id)
+                    .then(() => resolve(true))
+                    .catch(err => reject(err))
+                })
+                .catch(err => reject(err))
+            })
+            .catch(err => reject(err))
         });
     }
 }
