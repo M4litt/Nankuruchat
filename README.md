@@ -1,6 +1,7 @@
 # WRTC-dev
 ### Branch for developing real-time interfaces for integration within NankuruChat
 
+#### Fix VOIP, make .pems, test
 ## Done
 - Drop SIO in favor of WC
 - Signal server for messaging
