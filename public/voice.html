@@ -63,6 +63,7 @@
         ws.send(JSON.stringify(msg))
     }
 
+    let pc = null
     let peer = null
     let localStream = null
     let offStream = null
@@ -70,7 +71,7 @@
     // Enable stream pulling from mic
     enableMic.addEventListener('click', async e => {
         e.preventDefault()
-        localStream = await navigator.mediaDevices.getUserMedia({video: false, audio: true})
+        localStream = await navigator.mediaDevices.getUserMedia({audio: true})
         
         const STUN_servers = {
             iceServers: [
@@ -81,7 +82,7 @@
             iceCandidatePoolSize: 10,
         }
 
-        const pc = new RTCPeerConnection(STUN_servers)
+        pc = new RTCPeerConnection(STUN_servers)
 
         localStream.getTracks().forEach(track => {
             pc.addTrack(track, localStream)
@@ -89,7 +90,8 @@
 
         pc.ontrack = e => {
             offStream = e.streams[0]
-            offAudio.src = offStream
+            offAudio.srcObject = offStream
+            offAudio.onloadedmetadata = function(e) { offAudio .play(); };
             console.log(e.streams[0])
         }
 
