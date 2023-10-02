@@ -18,6 +18,9 @@ userRouter.post('/login', UserController.login);
 
 //userRouter.post('/', UserController.create); [DEPRECATED - USE REGISTER]
 
+userRouter.get('/:id/servers', UserController.getServers);
+
+
 // blocked
 userRouter.get('/:id/blocked', UserController.getBlockedUsers);
 userRouter.post('/:id/block/:blocked_id', UserController.blockUser);

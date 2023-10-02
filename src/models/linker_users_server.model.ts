@@ -2,6 +2,8 @@ import { RowDataPacket } from "mysql2";
 import { db } from "../db";
 import { User } from "../types/user.type";
 import { UserModel } from "./user.model";
+import { ServerModel } from "./server.model";
+import { Server } from "../types/server.type";
 
 export class LinkerUsersServerModel {
 
@@ -121,5 +123,27 @@ export class LinkerUsersServerModel {
                 }
             )
         });
+    }
+
+    public static getServersByUser(id_user:Number): Promise<any>
+    {
+        return new Promise((resolve, reject) => {
+            db.query(
+                `SELECT * FROM ${ServerModel.table_name} WHERE id IN (
+                    SELECT id_server FROM ${this.table_name} WHERE id_user = ?
+                )`,
+                [id_user],
+                (err, res) => {
+                    if (err) reject(err);
+                    const rows = <RowDataPacket[]> res;
+                    const servers: Server[] = [];
+
+                    rows.forEach(row => 
+                        servers.push(new Server(row.id, row.name, row.description, row.picture))
+                    );
+                    resolve(servers)
+                }
+            )
+        })
     }
 }
