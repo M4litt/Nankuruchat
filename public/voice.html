@@ -63,6 +63,7 @@
         ws.send(JSON.stringify(msg))
     }
 
+    let STUN_servers = null
     let pc = null
     let peer = null
     let localStream = null
@@ -73,7 +74,7 @@
         e.preventDefault()
         localStream = await navigator.mediaDevices.getUserMedia({audio: true})
         
-        const STUN_servers = {
+        STUN_servers = {
             iceServers: [
                 {
                     urls: ['stun:stun3.l.google.com:19302', 'stun:stun4.l.google.com:19302'],
@@ -91,7 +92,7 @@
         pc.ontrack = e => {
             offStream = e.streams[0]
             offAudio.srcObject = offStream
-            offAudio.onloadedmetadata = function(e) { offAudio .play(); };
+            offAudio.onloadedmetadata = function(e) { offAudio.play() }
             console.log(e.streams[0])
         }
 
@@ -216,10 +217,10 @@
 
     const handleLeave = () => {
         peer = null
-        offAudio.src = null 
+        offAudio.srcObject = null
         
         pc.onicecandidate = null 
-        pc.onaddstream = null
+        pc.ontrack = null
         pc = new RTCPeerConnection(STUN_servers)
     }
 </script>
