@@ -85,7 +85,7 @@ wss
                 break
             
                 case 'offer':
-                    console.log(`Creating call offer for: ${data.target}`)
+                    console.log(`Creating call offer for: ${data.target}, by: ${resolveName(ws)}`)
                     
                     var user = sockets.get(data.target)
 
@@ -95,27 +95,32 @@ wss
                             offer: data.offer,
                             name: resolveName(ws)
                         })
+                    } else {
+                        console.log(`User '${data.target}' not found...`)
                     }
                 break
                 
                 case 'answer':
+                    console.log(`${data.target} answered the call!`)
                     var user = sockets.get(data.target)
 
                     if(user) {
                         sendTo(user, {
                             type: 'answer',
                             answer: data.answer,
+                            name: resolveName(ws)
                         })
                     }
                 break
 
                 case 'candidate':
+                    console.log(`Sending ICE candidate to: ${data.target}`)
                     var user = sockets.get(data.target)
 
                     if(user) {
                         sendTo(user,{
-                            type: 'offer',
-                            offer: data.offer,
+                            type: 'candidate',
+                            candidate: data.candidate,
                             name: resolveName(ws)
                         })
                     }
@@ -126,7 +131,8 @@ wss
 
                     if(user) {
                         sendTo(user,{
-                            type: 'leave'
+                            type: 'leave',
+                            name: resolveName(ws)
                         })
                     }
                 break

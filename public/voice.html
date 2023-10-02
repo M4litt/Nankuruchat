@@ -63,17 +63,7 @@
         ws.send(JSON.stringify(msg))
     }
 
-    const STUN_servers = {
-        iceServers: [
-            {
-                urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
-            },
-        ],
-        iceCandidatePoolSize: 10,
-    }
-
-    const pc = new RTCPeerConnection(STUN_servers)
-    var peer = null
+    let peer = null
     let localStream = null
     let offStream = null
 
@@ -81,19 +71,38 @@
     enableMic.addEventListener('click', async e => {
         e.preventDefault()
         localStream = await navigator.mediaDevices.getUserMedia({video: false, audio: true})
-        offStream = new MediaStream()
+        
+        const STUN_servers = {
+            iceServers: [
+                {
+                    urls: ['stun:stun3.l.google.com:19302', 'stun:stun4.l.google.com:19302'],
+                },
+            ],
+            iceCandidatePoolSize: 10,
+        }
+
+        const pc = new RTCPeerConnection(STUN_servers)
 
         localStream.getTracks().forEach(track => {
             pc.addTrack(track, localStream)
         });
 
         pc.ontrack = e => {
-            e.streams[0].getTracks().forEach(track => {
-                offStream.addTrack(track)
-            })
+            offStream = e.streams[0]
+            offAudio.src = offStream
+            console.log(e.streams[0])
         }
 
-        offAudio.src = offStream
+        pc.onicecandidate = event => {
+            if(event.candidate) {
+                console.log('Sending candidate')
+                sendSignal({
+                    type: 'candidate',
+                    candidate: event.candidate,
+                    target: peer
+                })
+            }
+        }
 
         muteSelf.disabled = false
         muteThem.disabled = false
@@ -124,16 +133,16 @@
             break
 
             case "offer": 
-                handleOffer(data.offer)
+                handleOffer(data)
             break
             
             case "answer": 
-               handleAnswer(data.answer)
+               handleAnswer(data)
             break
             
             //when a remote peer sends an ice candidate to us 
             case "candidate": 
-               handleCandidate(data.candidate)
+               handleICECandidate(data)
             break
             
             case "leave": 
@@ -162,7 +171,7 @@
             return
         }
 
-        pc.createOffer(offer => {
+        pc.createOffer().then(offer => {
             peer = targetName
             sendSignal({
                 type: 'offer',
@@ -176,9 +185,9 @@
     })
 
     const handleOffer = offer => {
-        pc.setRemoteDescription(new RTCSessionDescription(offer))
+        pc.setRemoteDescription(new RTCSessionDescription(offer.offer))
 
-        pc.createAnswer(answer => {
+        pc.createAnswer().then(answer => {
             peer = offer.name
             pc.setLocalDescription(answer)
             sendSignal({
@@ -186,17 +195,21 @@
                 target: peer,
                 answer: answer
             })
-            console.log('Received offer, sent answer')
+            console.log(`Received offer, sent answer to ${peer}`)
         })
     }
 
     const handleAnswer = answer => {
-        pc.setRemoteDescription(new RTCSessionDescription(answer))
+        pc.setRemoteDescription(new RTCSessionDescription(answer.answer)).then( data => {
+            console.log('Set remote desc.')
+        })
         console.log('Received answer')
     }
 
     const handleICECandidate = candidate => {
-        pc.addIceCandidate(new RTCIceCandidate(candidate))
+        pc.addIceCandidate(new RTCIceCandidate(candidate.candidate)).then( data => {
+            console.log('Added remote ICE candidate')
+        })
     }
 
     const handleLeave = () => {
