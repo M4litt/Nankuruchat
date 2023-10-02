@@ -57,7 +57,7 @@
     const muteThem = document.querySelector('#mute-them')
     const hangUp = document.querySelector('#hang-up')
 
-    const ws = new WebSocket('ws://172.16.255.220:4356')
+    const ws = new WebSocket('wss://172.16.255.220:4356')
 
     const sendSignal = msg => {
         ws.send(JSON.stringify(msg))

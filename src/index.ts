@@ -2,10 +2,11 @@ import express from 'express'
 import { Server as httpsServer, ServerOptions} from 'https'
 import { Server as socketServer, WebSocket} from 'ws'
 import cors from 'cors'
+import { readFileSync } from 'fs'
 import path from 'path'
 
-const privateKey = path.join(__dirname, '..', 'public/certs/selfsigned.key')
-const certificate = path.join(__dirname, '..', 'public/certs/selfsigned.crt')
+const privateKey = readFileSync(require.resolve('../public/certs/key.pem'))
+const certificate = readFileSync(require.resolve('../public/certs/cert.pem'))
 const credentials = { key: privateKey, cert: certificate }
 
 const port = process.env.PORT || 4356
@@ -144,5 +145,5 @@ wss
 
 server
     .listen(port, () => {
-        console.log(`HTTP Server hosted on: http://localhost:${port}`)
+        console.log(`HTTP Server hosted on: https://localhost:${port}`)
     })
