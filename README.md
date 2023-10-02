@@ -9,13 +9,13 @@ Branch for developing real-time interfaces for integration within NankuruChat
 
 
 ## Done
-- Drop SIO in favor of WC
+- Drop SIO in favor of WS
 - Signal server for messaging
+- Signal Server for Voice chat
 
 ## TO DO
-- **FIX** Signal Server for Voice chat
 - Signal Server for Video chat
-- Self hosted STUN & TURN server via [coturn](https://github.com/coturn/coturn)
+- ~~Self hosted STUN & TURN server via [coturn](https://github.com/coturn/coturn)~~ Temporarily dropped in favor of public google turn servers.
 - Docker Images
 
 <br>
