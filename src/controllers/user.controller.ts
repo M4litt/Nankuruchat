@@ -161,7 +161,7 @@ export class UserController {
             user,
             process.env.JWT_SECRET || 'invalid-secret',
             {
-                expiresIn: '1h'
+                expiresIn: '24h'
             }
         )
     }
@@ -383,6 +383,15 @@ export class UserController {
         }
 
         LinkerUsersServerModel.getServersByUser(id)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
+    }
+
+    public static getByEmail(req:Request, res:Response)
+    {
+        const email = req.params.email;
+
+        UserModel.getByEmail(email)
         .then(data => res.status(200).json(data))
         .catch(err => res.status(400).json({'message': err}))
     }

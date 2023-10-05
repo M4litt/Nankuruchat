@@ -3,13 +3,24 @@ import { ServerModel } from "../models/server.model";
 import { Channel } from "../types/channel.type";
 import { LinkerUsersServerModel } from "../models/linker_users_server.model";
 import { UserModel } from "../models/user.model";
-import { LinkerChannelServerModel } from "../models/linker_channel_server.model";
-import { ChannelModel } from "../models/channel.model";
+import { User } from "../types/user.type";
+
+interface ServerJson 
+{
+    id:          Number;
+    name:        String;
+    description: String;
+    channels:    Channel[];
+    users:       User[];
+}
 
 export class ServerController {
-    public static getAll(req:Request, res:Response) {
+    public static async getAll(req:Request, res:Response) {
+
         ServerModel.getAll()
-        .then(data => res.status(200).json(data))
+        .then(servers => {
+            res.status(200).json(servers)
+        })
         .catch(err => res.status(400).json({'message': err}))
     }
 
@@ -22,7 +33,33 @@ export class ServerController {
         }
 
         ServerModel.getOne(id)
-        .then(data => res.status(200).json(data))
+        .then(server => {
+
+            if (!server) {
+                res.status(404).json({'message': 'server not found'});
+                return;
+            }
+
+            let serverJson:ServerJson = {
+                id: server.id,
+                name: server.name,
+                description: server.description,
+                channels: [],
+                users: []
+            }
+
+            ServerModel.getChannels(id)
+            .then(channels => {
+                serverJson.channels = channels
+                LinkerUsersServerModel.getUsersByServer(id)
+                .then(users => {
+                    serverJson.users = users
+                    res.status(200).json(serverJson)
+                })
+                .catch(err => res.status(400).json({'message': err}))
+            })
+            .catch(err => res.status(400).json({'message': err}))
+        })
         .catch(err => res.status(400).json({'message': err}))
     }
 
