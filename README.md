@@ -1,6 +1,9 @@
 # Nankuruback
 - by Kali <{@}>
 
+### TODO
+- Hacer que los GET de server para q devuelvan un objeto complejo con los canales y usuarios
+
 ### DONE
 - User
     - get all
