@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev-setup": "mkdir public;certs;cd public/certs;openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout key.pem -out cert.pem; cd ../..",
+    "dev-setup": "mkdir public/certs;openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout public/certs/key.pem -out public/certs/cert.pem",
     "dev": "npx nodemon ./src/index.ts",
     "build": "npx tsc",
     "run": "node ./dist/index.ts"
