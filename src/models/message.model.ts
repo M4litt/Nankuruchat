@@ -98,8 +98,10 @@ export class MessageModel {
         return new Promise((resolve, reject) => {
             // Add message to database
             db.query(
-                `INSERT INTO ${this.table_name} (id_sender, content, content_type) VALUES (?, ?, ?)`,
-                [message.id_sender, message.content, message.content_type],
+                `INSERT INTO ${this.table_name} 
+                    (id_sender, content, content_type, timestamp) 
+                VALUES (?, ?, ?, ?)`,
+                [message.id_sender, message.content, message.content_type, this.dateNow()],
                 (err, res) => {
                     if (err) reject(err);
                     resolve(res);
@@ -141,6 +143,12 @@ export class MessageModel {
 
     private static deleteFromLinkers(id:Number):Promise<boolean> {
         return LinkerChannelMessagesModel.deleteByMessage(id);
+    }
+
+    private static dateNow():string
+    {
+        const date = new Date();
+        return `${date.getFullYear()}-${date.getMonth()}-${date.getDay()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     }
 
 }
