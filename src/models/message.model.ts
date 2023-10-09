@@ -56,6 +56,44 @@ export class MessageModel {
         });
     }
 
+    public static getMessagesByChannel(channel_id:Number)
+    {
+        return new Promise((resolve, reject) => {
+            db.query(`
+                SELECT 
+                    user.username, 
+                    message.content, 
+                    message.content_type 
+                FROM 
+                    ${this.table_name} 
+                INNER JOIN 
+                    user 
+                ON 
+                    message.id_sender = user.id
+                WHERE message.id IN (
+                    SELECT id_message
+                    FROM linker_channel_messages
+                    WHERE id_channel = ?
+                )`,
+                [channel_id],
+                (err, res) => {
+                    if (err) reject(err);
+                    const row  = (<RowDataPacket> res)[0];
+                    try {
+                        const message = {
+                            username: row.username, 
+                            content: row.content, 
+                            content_type: row.content_type
+                        };
+                        resolve(message);
+                    } catch(error) {
+                        reject(`${this.table_name} not found`)
+                    }
+                }
+            )
+        });
+    }
+
     public static create(message:Message):Promise<any> {
         return new Promise((resolve, reject) => {
             // Add message to database

@@ -49,27 +49,47 @@ export class LinkerChannelMessagesModel {
     
     // extras
 
-    public static getMessagesByChannel(id_channel:Number): Promise<Message[]> {
+    public static getMessagesByChannel(id_channel:Number): Promise<any[]> {
         return new Promise((resolve, reject) => {
 
             db.query(
-                `SELECT * FROM ${MessageModel.table_name} WHERE id IN (
-                    SELECT id_message FROM ${this.table_name} WHERE id_channel = ?
-                )`,
+                `
+                SELECT 
+                    user.username,
+                    user.pfp,
+                    message.content,
+                    message.content_type
+                FROM 
+                    message
+                INNER JOIN
+                    user
+                ON
+                    message.id_sender = user.id
+                WHERE
+                    message.id IN (
+                        SELECT id_message FROM ${this.table_name} WHERE id_channel = ?
+                    )
+                `
+                ,
                 [id_channel],
                 (err, res) => {
                     if (err) reject(err);
 
                     const rows = <RowDataPacket[]> res;
-                    const messages:Message[] = [];
+                    const messages:{
+                        username:string,
+                        pfp:string,
+                        content:string,
+                        content_type:string
+                    }[] = [];
 
                     rows.forEach(row => 
-                        messages.push(new Message(
-                            row.id, 
-                            row.id_sender, 
-                            row.content, 
-                            row.content_type
-                        ))
+                        messages.push({
+                            username:     row.username,
+                            pfp:          row.pfp,
+                            content:      row.content,
+                            content_type: row.content_type
+                        })
                     );
                     resolve(messages)
                 }
