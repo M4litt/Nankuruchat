@@ -17,9 +17,42 @@ interface ServerJson
 export class ServerController {
     public static async getAll(req:Request, res:Response) {
 
-        ServerModel.getAll()
-        .then(servers => {
-            res.status(200).json(servers)
+        let promises:Promise<ServerJson>[] = [];
+
+        await ServerModel.getAll()
+        .then(async(servers) => {
+
+            servers.forEach(server => 
+                promises.push(
+                    new Promise<ServerJson>((resolve, reject) => {
+
+                        let serverJson:ServerJson = {
+                            id: server.id,
+                            name: server.name,
+                            description: server.description,
+                            channels: [],
+                            users: []
+                        };
+
+                        ServerModel.getChannels(server.id)
+                        .then(channels => {
+                            serverJson.channels = channels
+
+                            LinkerUsersServerModel.getUsersByServer(server.id)
+                            .then(users => {
+                                serverJson.users = users
+                                resolve(serverJson);
+                            })
+                            .catch(err => reject(err))
+                        })
+                        .catch(err => reject(err))
+                    })
+                )
+            );
+
+            const serversJson = await Promise.all(promises);
+
+            res.status(200).json(serversJson);
         })
         .catch(err => res.status(400).json({'message': err}))
     }
