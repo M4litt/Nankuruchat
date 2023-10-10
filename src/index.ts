@@ -69,20 +69,21 @@ wss
                             success: true
                         })
                     }
-                break
+                    break
 
                 case 'msg':
-                    var name: string = resolveName(ws)
                     sockets.forEach((val) => {
-                        if(val !== ws) { 
-                            sendTo(ws, {
-                                type: 'message',
-                                name: name,
-                                content: data.content
-                            })
-                        }
+                        
+                        if(val === ws) { return }
+                        
+                        sendTo(val, {
+                            type: 'message',
+                            name: resolveName(ws),
+                            content: data.content
+                        })
+                        
                     })
-                break
+                    break
             
                 case 'offer':
                     console.log(`Creating call offer for: ${data.target}, by: ${resolveName(ws)}`)
@@ -98,7 +99,7 @@ wss
                     } else {
                         console.log(`User '${data.target}' not found...`)
                     }
-                break
+                    break
                 
                 case 'answer':
                     console.log(`${data.target} answered the call!`)
@@ -111,7 +112,7 @@ wss
                             name: resolveName(ws)
                         })
                     }
-                break
+                    break
 
                 case 'candidate':
                     console.log(`Sending ICE candidate to: ${data.target}`)
@@ -124,7 +125,7 @@ wss
                             name: resolveName(ws)
                         })
                     }
-                break
+                    break
 
                 case 'leave':
                     var user = sockets.get(data.target)
@@ -135,7 +136,7 @@ wss
                             name: resolveName(ws)
                         })
                     }
-                break
+                    break
             }
         })
 
