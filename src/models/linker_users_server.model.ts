@@ -125,12 +125,17 @@ export class LinkerUsersServerModel {
         });
     }
 
-    public static getServersByUser(id_user:Number): Promise<any>
+    public static getServersByUser(id_user:Number): Promise<Server[]>
     {
         return new Promise((resolve, reject) => {
             db.query(
-                `SELECT * FROM ${ServerModel.table_name} WHERE id IN (
-                    SELECT id_server FROM ${this.table_name} WHERE id_user = ?
+                `
+                SELECT * FROM ${ServerModel.table_name} 
+                WHERE id 
+                IN (
+                    SELECT id_server 
+                    FROM ${this.table_name} 
+                    WHERE id_user = ?
                 )`,
                 [id_user],
                 (err, res) => {
@@ -144,6 +149,13 @@ export class LinkerUsersServerModel {
                     resolve(servers)
                 }
             )
+        })
+    }
+
+    public static getServersByUser_(id_user:Number):Promise<any>
+    {
+        return new Promise((resolve, reject) => {
+
         })
     }
 }

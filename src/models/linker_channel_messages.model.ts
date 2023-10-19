@@ -71,7 +71,7 @@ export class LinkerChannelMessagesModel {
                         SELECT id_message FROM linker_channel_messages WHERE id_channel = ?
                     )
                 ORDER BY message.timestamp DESC
-                LIMIT 10
+                LIMIT 20
                 `
                 ,
                 [id_channel],
@@ -131,23 +131,3 @@ export class LinkerChannelMessagesModel {
         
     }
 }
-/*
-SELECT 
-    user.username,
-    user.pfp,
-    message.content,
-    message.content_type,
-    message.timestamp
-FROM 
-    message
-INNER JOIN
-    user
-ON
-    message.id_sender = user.id
-WHERE
-    message.id IN (
-        SELECT id_message FROM linker_channel_messages WHERE id_channel = 12
-    )
-ORDER BY message.timestamp DESC
-LIMIT 100
-*/

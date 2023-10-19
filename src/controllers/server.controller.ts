@@ -5,7 +5,7 @@ import { LinkerUsersServerModel } from "../models/linker_users_server.model";
 import { UserModel } from "../models/user.model";
 import { User } from "../types/user.type";
 
-interface ServerJson 
+export interface ServerJson 
 {
     id:          Number;
     name:        String;

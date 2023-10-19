@@ -1,13 +1,17 @@
 import { Request, Response } from "express";
-import { UserModel } from "../models/user.model";
-import { User } from "../types/user.type";
 import { createHash } from "node:crypto";
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import { User } from "../types/user.type";
+
+// models
+import { UserModel } from "../models/user.model";
 import { FriendsModel } from "../models/friends.model";
 import { EnemiesModel } from "../models/enemies.model";
 import { BlockedModel } from "../models/blocked.model";
 import { LinkerUsersServerModel } from "../models/linker_users_server.model";
+import { ServerModel } from "../models/server.model";
+import { ServerJson } from "./server.controller";
 
 dotenv.config()
 
@@ -383,7 +387,40 @@ export class UserController {
         }
 
         LinkerUsersServerModel.getServersByUser(id)
-        .then(data => res.status(200).json(data))
+        .then(async(servers) =>
+        {
+            let threadPool:Promise<any>[] = [];
+            
+            servers.forEach(server => 
+            {
+                threadPool.push(
+                    new Promise((resolve, reject) => {
+                        let serverJson:ServerJson = {
+                            id: server.id,
+                            name: server.name,
+                            description: server.description,
+                            channels: [],
+                            users: []
+                        };
+                        ServerModel.getChannels(server.id)
+                        .then(channels => {
+                            serverJson.channels = channels
+
+                            LinkerUsersServerModel.getUsersByServer(server.id)
+                            .then(users => {
+                                serverJson.users = users
+                                resolve(serverJson);
+                            })
+                            .catch(err => reject(err))
+                        })
+                        .catch(err => reject(err))
+                    })
+                );
+            });
+            const serversJson = await Promise.all(threadPool);   
+
+            res.status(200).json(serversJson);
+        })
         .catch(err => res.status(400).json({'message': err}))
     }
 
