@@ -62,5 +62,6 @@ CREATE TABLE `nankuruchat`.`message` (
     `id_sender`    INT NOT NULL,
     `content`      VARCHAR(5000) NOT NULL,
     `content_type` VARCHAR(50) NOT NULL,
+    `timestamp`    DATETIME,
     PRIMARY KEY(id)
 );
