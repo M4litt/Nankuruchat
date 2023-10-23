@@ -5,11 +5,11 @@ USE `nankuruchat`;
 
 CREATE TABLE `nankuruchat`.`user` (
     `id`          INT NOT NULL AUTO_INCREMENT,
-    `username`    VARCHAR(50)  NOT NULL,
-    `pfp`         VARCHAR(1024)NOT NULL,   -- base 64
-    `email`       VARCHAR(50)  NOT NULL,
+    `username`    VARCHAR(16)  NOT NULL,
+    `pfp`         VARCHAR(128) NOT NULL,   -- route folder/folder/file.png
+    `email`       VARCHAR(128) NOT NULL,
     `password`    VARCHAR(64)  NOT NULL,   -- hashed
-    `description` VARCHAR(500) NOT NULL
+    `description` VARCHAR(256) NOT NULL
     PRIMARY KEY(id)
 );
 
@@ -30,9 +30,9 @@ CREATE TABLE `nankuruchat`.`blocked`  (
 
 CREATE TABLE `nankuruchat`.`server` (
     `id`          INT NOT NULL AUTO_INCREMENT,
-    `name`        VARCHAR(50) NOT NULL,
-    `description` VARCHAR(500) NOT NULL,
-    `picture`     VARCHAR(500) NOT NULL,
+    `name`        VARCHAR(50)  NOT NULL,
+    `description` VARCHAR(256) NOT NULL,
+    `picture`     VARCHAR(128) NOT NULL, -- route folder/folder/file.jpg
     PRIMARY KEY(id)
 );
 
@@ -48,7 +48,7 @@ CREATE TABLE `nankuruchat`.`linker_channel_server` (
 
 CREATE TABLE `nankuruchat`.`channel` (
     `id`   INT NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(50) NOT NULL,
+    `name` VARCHAR(32) NOT NULL,
     PRIMARY KEY(id)
 );
 
@@ -60,8 +60,8 @@ CREATE TABLE `nankuruchat`.`linker_channel_messages` (
 CREATE TABLE `nankuruchat`.`message` (
     `id`           INT NOT NULL AUTO_INCREMENT,
     `id_sender`    INT NOT NULL,
-    `content`      VARCHAR(5000) NOT NULL,
-    `content_type` VARCHAR(50) NOT NULL,
+    `content`      VARCHAR(512) NOT NULL,
+    `content_type` VARCHAR(32) NOT NULL,
     `timestamp`    DATETIME DEFAULT NOW(),
     PRIMARY KEY(id)
 );
