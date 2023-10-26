@@ -16,18 +16,21 @@
 <script>
     const form = document.querySelector("#fileUp")
     const input = form.children[0]
+    const name = "elpapu"
 
     form.addEventListener("submit", e => {
         e.preventDefault()
         const data = new FormData()
+        
         Array.from(input.files).forEach(element => {
             data.append(element.name.split('.')[0], element)
         });
+        data.append("userName", name)
         
 
         fetch("http://127.0.0.1:28322/save", {
             method: "POST",
-            body: data 
+            body: data
         })
     })
 </script>
