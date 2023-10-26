@@ -1,3 +1,3 @@
-# CDN-dev
+# CDN-stable
 
-#### Branch for developing the Content Delivery Network
+#### Stable branch for integrating CDN with Stable-back
