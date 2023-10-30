@@ -1,10 +1,23 @@
-import express from "express"
-import fileUpload, { FileArray, UploadedFile } from "express-fileupload"
-import path from "path"
-import cors from "cors"
+import express, { Request, Response } from 'express';
+import fileUpload from "express-fileupload";
+import dotenv from 'dotenv';
+import * as db from './db';
+import cors from 'cors';
 
-const app = express()
-const port = process.env.PORT || 28322
+// routes
+import { userRouter }    from './routes/user.routes';
+import { MessageRouter } from './routes/message.routes';
+import { channelRouter } from './routes/channel.routes';
+import { serverRouter }  from './routes/server.routes';
+import { cdnRouter } from './routes/cdn.routes';
+
+// auth
+import { auth } from './middleware/auth.middleware';
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT;
 
 const fileUploadConfig = {
     limits: {
@@ -12,31 +25,25 @@ const fileUploadConfig = {
     },
     createParentPath: true,
     abortOnLimit: true
-}
+};
 
 const corsConfig = {
     origin: '*',
     optionsSuccessStatus: 200
-}
+};
 
 app
-    .use(express.json())
-    .use(fileUpload(fileUploadConfig))
     .use(cors(corsConfig))
-    .get("/", (req, res) => {
-        res.status(200).sendFile(path.join(__dirname, "..", "public", "index.html"))
-    })
-    .post("/save", (req, res) => {
-        const files = JSON.parse(JSON.stringify(req.files))
+    .use(fileUpload(fileUploadConfig))
+    .use(express.json())
+    .use('/user',    userRouter)
+    .use('/message', auth, MessageRouter)
+    .use('/channel', auth, channelRouter)
+    .use('/server',  auth, serverRouter)
+    .use('/cdn', cdnRouter)
+    .get('/', (req:Request, res:Response) => res.status(200).json('NankuruBack is awaken <👁>'))
+    .listen(PORT, () => {
+        console.log(`NankuruChat-back deployed on http://localhost:${PORT}`);
+    });
 
-        
-        for(const key in files) {
-            const file = req.files![key] as UploadedFile
-            file.mv(path.join(__dirname, "..", "data", req.body.userName, file.name))
-        }
-        
-        res.status(201).redirect('/')/*.send({ created: true }) */ //! Replace .redirect() with .send() before deployment
-    })
-    .listen(port, () => {
-        console.log(`App listening on http://localhost:${port}`)
-    })
+db.init();
