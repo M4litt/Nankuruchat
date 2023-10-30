@@ -1,7 +1,8 @@
 import express from "express"
-import fileUpload, { FileArray, UploadedFile } from "express-fileupload"
+import fileUpload, { UploadedFile } from "express-fileupload"
 import path from "path"
 import cors from "cors"
+import dotenv from "dotenv"
 
 const app = express()
 const port = process.env.PORT || 28322
