@@ -13,8 +13,4 @@ export class cdnController {
         
         res.status(201).send()
     }
-
-    public static getContent(req: Request, res: Response){
-        res.status(200).send("TODO")
-    }
 }
