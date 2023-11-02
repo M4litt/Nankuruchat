@@ -25,16 +25,6 @@ const sendTo = (con: WebSocket, obj: object) => {
     con.send(JSON.stringify(obj))
 }
 
-app
-    .use(cors(corsOptions))
-    .use(express.json())
-    .get('/chat', (req, res) => {
-        res.status(200).sendFile(path.join(__dirname, '..', 'public/index.html'))
-    })
-    .get('/vc', (req, res) => {
-        res.status(200).sendFile(path.join(__dirname, '..', 'public/voice.html'))
-    })
-
 const resolveName = (ws: WebSocket): string => {
     let name: string = 'nameless'
     sockets.forEach((val, key) => {
@@ -45,6 +35,15 @@ const resolveName = (ws: WebSocket): string => {
     return name
 }
 
+app
+    .use(cors(corsOptions))
+    .use(express.json())
+    .get('/chat', (req, res) => {
+        res.status(200).sendFile(path.join(__dirname, '..', 'public/index.html'))
+    })
+    .get('/vc', (req, res) => {
+        res.status(200).sendFile(path.join(__dirname, '..', 'public/voice.html'))
+    })
 
 wss
     .on('connection', (ws, req) => {
@@ -72,17 +71,33 @@ wss
                     break
 
                 case 'msg':
-                    sockets.forEach((val) => {
-                        
-                        if(val === ws) { return }
-                        
-                        sendTo(val, {
-                            type: 'message',
+                    if(data.target && sockets.get(data.target)) {
+                        sendTo(sockets.get(data.target)!, {
+                            type: "message",
                             name: resolveName(ws),
-                            content: data.content
+                            pfp: data.pfp,
+                            timeStamp: data.timeStamp,
+                            content: data.content,
+                            files: data.files ? data.files : undefined
                         })
-                        
-                    })
+                    } else {
+                        const targets: Array<string> = data.serverUsers
+                        targets.forEach(val => {
+                            if(val === resolveName(ws)) { return }
+    
+                            sendTo(sockets.get(val)!, {
+                                type: "message",
+                                name: resolveName(ws),
+                                pfp: data.pfp,
+                                server: data.server,
+                                channel: data.channel,
+                                timeStamp: data.timeStamp,
+                                content: data.content,
+                                files: data.files ? data.files : undefined
+                            })
+                            
+                        })
+                    }
                     break
             
                 case 'offer':
