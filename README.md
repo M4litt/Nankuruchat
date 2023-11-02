@@ -9,28 +9,28 @@ Branch for developing real-time interfaces for integration within NankuruChat
 
 ### Message models:
 
-For DMs
+- For DMs
 
-    {
-        type: "message",
-        pfp: File,
-        target: string (UUID),
-        timeStamp: string,
-        content: string,
-        files: File/s | undefined
-    }
+        {
+            type: "message",
+            pfp: File,
+            target: string (UUID),
+            timeStamp: string,
+            content: string,
+            files: File/s | undefined
+        }
 
-For Server/channel
+- For Server/channel
 
-    {
-        type: "message", 
-        pfp: File,
-        server: int,
-        channel: int,
-        timeStamp: string,
-        content: string,
-        files: File/s : undefined
-    }
+        {
+            type: "message", 
+            pfp: File,
+            server: int,
+            channel: int,
+            timeStamp: string,
+            content: string,
+            files: File/s : undefined
+        }
 
 ## Done
 - Drop SIO in favor of WS.
