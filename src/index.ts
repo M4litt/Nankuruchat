@@ -41,6 +41,7 @@ app
     .use('/channel', auth, channelRouter)
     .use('/server',  auth, serverRouter)
     .use('/cdn', cdnRouter)
+    .use('/public', express.static('data'))
     .get('/', (req:Request, res:Response) => res.status(200).json('NankuruBack is awaken <👁>'))
     .listen(PORT, () => {
         console.log(`NankuruChat-back deployed on http://localhost:${PORT}`);
