@@ -32,7 +32,7 @@ jobs:
         echo "${{ secrets.SSL_CERT }}" | base64 --decode > cert.pem
     
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ghcr.io/m4litt/nankuruchat:signaling.latest
+      run: docker build . --file Dockerfile --tag ghcr.io/m4litt/nkc-signaling:latest
 
     - name: Publish to Github Registry
-      run: docker push ghcr.io/m4litt/nankuruchat:signaling.latest
+      run: docker push ghcr.io/m4litt/nkc-signaling:latest
