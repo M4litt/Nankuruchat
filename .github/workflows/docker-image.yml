@@ -19,8 +19,8 @@ jobs:
     - name: Build project
       run: npm install; npm run build
     
-    - name: Create SSL certs    
-      run: mkdir public/certs;openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout public/certs/key.pem -out public/certs/cert.pem
+    - name: Pull SSL certs from Github secrets    
+      run: echo "${{ secrets.SSL_KEY }}" | base64 --decode > key.pem; echo "${{ secrets.SSL_CERT }}" | base64 --decode > cert.pem
     
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag NKC-signaling:stable.$(date +%s)
