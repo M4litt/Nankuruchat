@@ -5,8 +5,8 @@ RUN mkdir -p ./app/public/certs
 WORKDIR /app/
 
 COPY ./dist/* /app/
-COPY ./*.pem /app/public/certs/
 COPY ./package.json /app/
+COPY ./*.pem /app/public/certs/
 RUN npm install --omit=dev
 
 EXPOSE 4356

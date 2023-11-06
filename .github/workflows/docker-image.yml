@@ -23,4 +23,4 @@ jobs:
       run: echo "${{ secrets.SSL_KEY }}" | base64 --decode > key.pem; echo "${{ secrets.SSL_CERT }}" | base64 --decode > cert.pem
     
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag NKC-signaling:stable.$(date +%s)
+      run: docker build . --file Dockerfile --tag nkc-signaling:stable.$(date +%s)
