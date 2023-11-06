@@ -25,16 +25,6 @@ const sendTo = (con: WebSocket, obj: object) => {
     con.send(JSON.stringify(obj))
 }
 
-app
-    .use(cors(corsOptions))
-    .use(express.json())
-    .get('/chat', (req, res) => {
-        res.status(200).sendFile(path.join(__dirname, '..', 'public/index.html'))
-    })
-    .get('/vc', (req, res) => {
-        res.status(200).sendFile(path.join(__dirname, '..', 'public/voice.html'))
-    })
-
 const resolveName = (ws: WebSocket): string => {
     let name: string = 'nameless'
     sockets.forEach((val, key) => {
@@ -45,6 +35,9 @@ const resolveName = (ws: WebSocket): string => {
     return name
 }
 
+app
+    .use(cors(corsOptions))
+    .use(express.json())
 
 wss
     .on('connection', (ws, req) => {

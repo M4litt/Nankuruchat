@@ -13,6 +13,10 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+
+    - run: npm install; npm run build
+    - run: mkdir public/certs;openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout public/certs/key.pem -out public/certs/cert.pem
+
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag NKC-signaling:$(date +%s)
+      run: docker build . --file Dockerfile --tag NKC-signaling:stable.$(date +%s)
