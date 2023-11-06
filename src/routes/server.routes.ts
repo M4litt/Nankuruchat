@@ -48,3 +48,4 @@ serverRouter.post('/:id_server/users/:id_user', ServerController.addUser);
 
 serverRouter.delete('/:id_server/users/:id_user', ServerController.removeUser);
 
+// admin // -------------------------------------------------------------------------------------------

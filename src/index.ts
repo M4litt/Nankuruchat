@@ -9,7 +9,7 @@ import { userRouter }    from './routes/user.routes';
 import { MessageRouter } from './routes/message.routes';
 import { channelRouter } from './routes/channel.routes';
 import { serverRouter }  from './routes/server.routes';
-import { cdnRouter } from './routes/cdn.routes';
+import { cdnRouter }     from './routes/cdn.routes';
 
 // auth
 import { auth } from './middleware/auth.middleware';
@@ -20,9 +20,7 @@ const app = express();
 const PORT = process.env.PORT;
 
 const fileUploadConfig = {
-    limits: {
-        fileSize: 4 * (1024**2)
-    },
+    limits: { fileSize: 4 * (1024**2) },
     createParentPath: true,
     abortOnLimit: true
 };
@@ -33,18 +31,16 @@ const corsConfig = {
 };
 
 app
-    .use(cors(corsConfig))
-    .use(fileUpload(fileUploadConfig))
-    .use(express.json())
-    .use('/user',    userRouter)
-    .use('/message', auth, MessageRouter)
-    .use('/channel', auth, channelRouter)
-    .use('/server',  auth, serverRouter)
-    .use('/cdn', cdnRouter)
-    .use('/public', express.static('data'))
-    .get('/', (req:Request, res:Response) => res.status(200).json('NankuruBack is awaken <👁>'))
-    .listen(PORT, () => {
-        console.log(`NankuruChat-back deployed on http://localhost:${PORT}`);
-    });
+.use(cors(corsConfig))
+.use(fileUpload(fileUploadConfig))
+.use(express.json())
+.use('/user',          userRouter)
+.use('/message', auth, MessageRouter)
+.use('/channel', auth, channelRouter)
+.use('/server',  auth, serverRouter)
+.use('/cdn',           cdnRouter)
+.get('/', (req:Request, res:Response) => res.status(200).json('NankuruBack is awaken <👁>'))
+.use('/public', express.static('data'))
+.listen(PORT, () => console.log(`NankuruChat-back deployed on http://localhost:${PORT}`));
 
 db.init();

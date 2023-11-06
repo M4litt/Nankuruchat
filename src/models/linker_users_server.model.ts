@@ -91,12 +91,12 @@ export class LinkerUsersServerModel {
         });
     }
 
-    public static addUserToServer(id_user:Number, id_server:Number): Promise<any>
+    public static addUserToServer(id_user:Number, id_server:Number, admin_level:Number): Promise<any>
     {
         return new Promise((resolve, reject) => {
             db.query(
-                `INSERT INTO ${this.table_name} (id_user, id_server) VALUES (?, ?)`,
-                [id_user, id_server],
+                `INSERT INTO ${this.table_name} (id_user, id_server, admin) VALUES (?, ?, ?)`,
+                [id_user, id_server, admin_level],
                 (err, res) => {
                     if (err) reject(err);
                     resolve(res);

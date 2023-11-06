@@ -363,6 +363,10 @@ export class ServerController {
         const user_id = Number(req.params.id_user);
         const server_id = Number(req.params.id_server);
 
+        let admin_level = Number(req.body.admin_level);
+
+        if (isNaN(admin_level)) admin_level = 0;
+        
         UserModel.getOne(user_id)
         .then(data => {
 
@@ -379,7 +383,7 @@ export class ServerController {
                     return;
                 }
 
-                LinkerUsersServerModel.addUserToServer(user_id, server_id)
+                LinkerUsersServerModel.addUserToServer(user_id, server_id, admin_level)
                 .then(data => res.status(200).json(data))
                 .catch(err => res.status(400).json({'message': err}))
             })
