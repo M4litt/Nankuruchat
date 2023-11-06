@@ -21,4 +21,29 @@ export class User {
         this.password = password;
         this.description = description;
     }
+
+    public toUserJson(): UserJson 
+    {
+        return {
+            id:        this.id,
+            username:  this.username,
+            pfp:       this.pfp,
+            email:     this.email,
+            description:this.description,
+            friends:   [],
+            enemies:   []
+        }
+    }
+}
+
+export interface UserJson
+{
+    id:         Number;
+    username:   String;
+    pfp:        String;
+    email:      String;
+    description:String;
+
+    friends:UserJson[];
+    enemies:UserJson[];
 }

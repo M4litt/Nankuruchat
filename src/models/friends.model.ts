@@ -35,7 +35,7 @@ export class FriendsModel
         });
     }
 
-    public static getFriends(id:number): Promise<User[]>
+    public static getFriends(id:Number): Promise<User[]>
     {
         return new Promise((resolve, reject) => {
             db.query(

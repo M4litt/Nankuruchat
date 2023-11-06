@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { createHash } from "node:crypto";
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
-import { User } from "../types/user.type";
+import { User, UserJson } from "../types/user.type";
 
 // models
 import { UserModel } from "../models/user.model";
@@ -17,10 +17,59 @@ dotenv.config()
 
 export class UserController {
 
-    public static getAll(req:Request, res:Response) {
-        UserModel.getAll()
-        .then(data => res.status(200).json(data))
+    public static async getAll(req:Request, res:Response) {
+
+        let promises: Promise<UserJson>[] = [];
+
+        await UserModel.getAll()
+        .then(users => {
+            users.forEach(user => promises.push(
+                new Promise((resolve, reject) => {
+                    const userJson:UserJson = 
+                    {
+                        id:          user.id,
+                        username:    user.username,
+                        pfp:         user.pfp,
+                        email:       user.email,
+                        description: user.description,
+                        friends:     [],
+                        enemies:     []
+                    }
+                    FriendsModel.getFriends(user.id)
+                    .then(friends => {
+                    
+                    let friendsJson:UserJson[] = [];
+
+                    // cast user to userJson
+                    friends.forEach(friend => friendsJson.push(friend.toUserJson()));
+
+                    userJson.friends = friendsJson;
+
+                    EnemiesModel.getEnemies(user.id)
+                    .then(enemies => {
+
+                        let enemiesJson:UserJson[] = [];
+
+                        // cast user to userJson
+                        enemies.forEach(enemy => enemiesJson.push(enemy.toUserJson()));
+
+                        userJson.enemies = enemiesJson;
+
+                        resolve(userJson)
+                })
+                .catch(err => reject(err));
+            })
+            .catch(err => reject(err));
+
+            })));
+
+            Promise.all(promises)
+            .then(data => res.status(200).json(data))
+            .catch(err => res.status(400).json({'message': err}))
+        }
+        )
         .catch(err => res.status(400).json({'message': err}))
+
     }
     
     public static create(req:Request, res:Response) {
@@ -31,6 +80,7 @@ export class UserController {
     }
 
     public static getOne(req:Request, res:Response) {
+        
         const id = Number(req.params.id);
 
         if (isNaN(id)) {
@@ -39,7 +89,46 @@ export class UserController {
         }
 
         UserModel.getOne(id)
-        .then(data => res.status(200).json(data))
+        .then((user) => 
+        {
+            if (!user) return;
+
+            const userJson:UserJson = 
+            {
+                id:          user.id,
+                username:    user.username,
+                pfp:         user.pfp,
+                email:       user.email,
+                description: user.description,
+                friends:     [],
+                enemies:     []
+            }
+            FriendsModel.getFriends(user.id)
+            .then(friends => {
+                
+                let friendsJson:UserJson[] = [];
+
+                // cast user to userJson
+                friends.forEach(friend => friendsJson.push(friend.toUserJson()));
+
+                userJson.friends = friendsJson;
+
+                EnemiesModel.getEnemies(user.id)
+                .then(enemies => {
+
+                    let enemiesJson:UserJson[] = [];
+
+                    // cast user to userJson
+                    enemies.forEach(enemy => enemiesJson.push(enemy.toUserJson()));
+
+                    userJson.enemies = enemiesJson;
+
+                    res.status(200).json(userJson);
+                })
+                .catch(err => res.status(400).json({'message': err}));
+            })
+            .catch(err => res.status(400).json({'message': err}))
+        })
         .catch(err => res.status(400).json({'message': err}))
     }
 

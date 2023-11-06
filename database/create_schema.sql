@@ -38,7 +38,9 @@ CREATE TABLE `nankuruchat`.`server` (
 
 CREATE TABLE `nankuruchat`.`linker_users_server` (
     `id_user`   INT NOT NULL,
-    `id_server` INT NOT NULL
+    `id_server` INT NOT NULL,
+    `admin`     INT NOT NULL DEFAULT 0,
+    CHECK(admin BETWEEN 0 AND 2)
 );
 
 CREATE TABLE `nankuruchat`.`linker_channel_server` (
@@ -64,4 +66,9 @@ CREATE TABLE `nankuruchat`.`message` (
     `content_type` VARCHAR(32) NOT NULL,
     `timestamp`    DATETIME DEFAULT NOW(),
     PRIMARY KEY(id)
+);
+
+CREATE TABLE `nankuruchat`.`admin` (
+    `id_user`   INT NOT NULL,
+    `id_server` INT NOT NULL
 );

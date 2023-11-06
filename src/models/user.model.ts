@@ -1,6 +1,6 @@
 import { RowDataPacket } from "mysql2";
 import { db } from "../db";
-import { User } from "../types/user.type";
+import { User, UserJson } from "../types/user.type";
 import { BlockedModel } from "./blocked.model";
 import { FriendsModel } from "./friends.model";
 import { EnemiesModel } from "./enemies.model";

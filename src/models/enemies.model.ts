@@ -35,7 +35,7 @@ export class EnemiesModel
         })
     }
 
-    public static getEnemies(id:number): Promise<User[]>
+    public static getEnemies(id:Number): Promise<User[]>
     {
         return new Promise((resolve, reject) => {
             db.query(
