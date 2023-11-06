@@ -27,4 +27,4 @@ jobs:
     - name: Build the Docker image
       run: |
         docker build . --file Dockerfile --tag nkc-signaling:stable.latest
-        docker push ghcr.io/M4litt/hello-docker-gcr-demo:latest
+        docker push ghcr.io/m4litt/hello-docker-gcr-demo:latest
