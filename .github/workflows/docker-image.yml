@@ -3,8 +3,6 @@ name: Docker Image CI
 on:
   push:
     branches: [ "WRTC-stable" ]
-  pull_request:
-    branches: [ "WRTC-stable" ]
 
 jobs:
 
@@ -20,7 +18,7 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: ghcr.io
-        username: ${{ github.actor }}
+        username: ${{ secrets.ACTION_USER }}
         password: ${{ secrets.ACTION_TOKEN }}
 
     - name: Build project
