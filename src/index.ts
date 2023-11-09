@@ -38,12 +38,6 @@ const resolveName = (ws: WebSocket): string => {
 app
     .use(cors(corsOptions))
     .use(express.json())
-    .get('/chat', (req, res) => {
-        res.status(200).sendFile(path.join(__dirname, '..', 'public/index.html'))
-    })
-    .get('/vc', (req, res) => {
-        res.status(200).sendFile(path.join(__dirname, '..', 'public/voice.html'))
-    })
 
 wss
     .on('connection', (ws, req) => {
