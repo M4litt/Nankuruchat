@@ -1,6 +1,6 @@
 # WRTC-stable
 
-Branch for developing real-time interfaces for integration within NankuruChat
+Signaling server stable branch for integration within NankuruChat
 
 ## Features
 - Messaging.
