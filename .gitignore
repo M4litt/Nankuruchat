@@ -1,6 +1,3 @@
-# Ignore templates #! Stable only
-*.html
-
 # Certs
 *.pem
 *.crt
