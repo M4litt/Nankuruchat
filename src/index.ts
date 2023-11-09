@@ -48,10 +48,8 @@ app
 wss
     .on('connection', (ws, req) => {
         console.log(`started connection from: ${req.socket.remoteAddress}`) 
-
         ws.on('message', (msg) => {
             const data = JSON.parse(msg.toString())
-
             switch(data.type){
                 case 'login':
                     var name: string = data.name
@@ -69,9 +67,8 @@ wss
                         })
                     }
                     break
-
                 case 'msg':
-                    if(data.target && sockets.get(data.target)) {
+                    if(data.target && sockets.get(JSON.stringify(data.target))) {
                         sendTo(sockets.get(data.target)!, {
                             type: "message",
                             name: resolveName(ws),
@@ -82,10 +79,12 @@ wss
                         })
                     } else {
                         const targets: Array<string> = data.serverUsers
-                        targets.forEach(val => {
-                            if(val === resolveName(ws)) { return }
-    
-                            sendTo(sockets.get(val)!, {
+                        targets.forEach( val => {
+                            const uuid = JSON.stringify(val)
+                            if(uuid === resolveName(ws)) { return }
+                            if(sockets.get(uuid) === undefined) { return }
+
+                            sendTo(sockets.get(uuid)!, {
                                 type: "message",
                                 name: resolveName(ws),
                                 pfp: data.pfp,
@@ -95,16 +94,15 @@ wss
                                 content: data.content,
                                 files: data.files ? data.files : undefined
                             })
-                            
+
                         })
                     }
                     break
-            
+                
                 case 'offer':
                     console.log(`Creating call offer for: ${data.target}, by: ${resolveName(ws)}`)
-                    
-                    var user = sockets.get(data.target)
 
+                    var user = sockets.get(data.target)
                     if(user) {
                         sendTo(user, {
                             type: 'offer',
@@ -119,7 +117,6 @@ wss
                 case 'answer':
                     console.log(`${data.target} answered the call!`)
                     var user = sockets.get(data.target)
-
                     if(user) {
                         sendTo(user, {
                             type: 'answer',
@@ -128,11 +125,9 @@ wss
                         })
                     }
                     break
-
                 case 'candidate':
                     console.log(`Sending ICE candidate to: ${data.target}`)
                     var user = sockets.get(data.target)
-
                     if(user) {
                         sendTo(user,{
                             type: 'candidate',
@@ -141,10 +136,8 @@ wss
                         })
                     }
                     break
-
                 case 'leave':
                     var user = sockets.get(data.target)
-
                     if(user) {
                         sendTo(user,{
                             type: 'leave',
@@ -154,7 +147,6 @@ wss
                     break
             }
         })
-
         ws.on('close', () => {
             console.log(`stopped connection from: ${req.socket.remoteAddress}`)
             sockets.forEach( (val, key) => {
