@@ -1,24 +1,36 @@
 {
-  "name": "nankuruchat",
-  "version": "0.1.0",
+  "name": "back-v1.0.0",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx nodemon ./src/index.ts",
-    "build": "npx tsc",
-    "start": "node ./dist/index.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx nodemon src/index.ts",
+    "init": "npm install && npm run dev",
+    "build": "npx run tsc"
   },
   "author": "",
-  "license": "MIT",
+  "license": "ISC",
+  "dependencies": {
+    "busboy": "^1.6.0",
+    "cors": "^2.8.5",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.6.0",
+    "express-fileupload": "^1.4.1"
+  },
   "devDependencies": {
-    "@types/express": "^4.17.17",
+    "@types/bcrypt": "^5.0.0",
+    "@types/busboy": "^1.5.2",
+    "@types/cors": "^2.8.15",
+    "@types/express": "^4.17.20",
+    "@types/express-fileupload": "^1.4.3",
+    "@types/jsonwebtoken": "^9.0.3",
     "@types/node": "^20.5.0",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
-    "typescript": "^5.1.6"
-  },
-  "dependencies": {
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2"
+    "typescript": "^5.2.2"
   }
 }
