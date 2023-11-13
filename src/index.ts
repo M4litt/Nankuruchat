@@ -17,7 +17,7 @@ import { auth } from './middleware/auth.middleware';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 12471;
 
 const fileUploadConfig = {
     limits: { fileSize: 4 * (1024**2) },
