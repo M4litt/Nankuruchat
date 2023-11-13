@@ -7,19 +7,19 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx nodemon src/index.ts",
     "init": "npm install && npm run dev",
-    "build": "npx run tsc"
+    "build": "npx tsc"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "busboy": "^1.6.0",
     "cors": "^2.8.5",
-    "bcrypt": "^5.1.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-fileupload": "^1.4.1",
     "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.6.0",
-    "express-fileupload": "^1.4.1"
+    "mysql2": "^3.6.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
