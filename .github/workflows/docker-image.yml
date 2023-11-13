@@ -1,0 +1,31 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-22.04
+
+    steps:      
+    
+    - uses: actions/checkout@v3
+    
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ secrets.ACTION_USER }}
+        password: ${{ secrets.ACTION_TOKEN }}
+
+    - name: Compile project
+      run: npm install; npm run build
+    
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag ghcr.io/m4litt/nkc-back:latest
+
+    - name: Publish to Github Registry
+      run: docker push ghcr.io/m4litt/nkc-back:latest
