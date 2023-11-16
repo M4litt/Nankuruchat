@@ -93,9 +93,9 @@ export class ServerModel {
     public static addChannel(id_server:Number, channel:Channel):Promise<any> {
         return new Promise((resolve, reject) => {
             ChannelModel.create(channel)
-            .then(data => {
-                LinkerChannelServerModel.create(data.insertId, id_server)
-                .then(data => resolve(data))
+            .then(data2 => {
+                LinkerChannelServerModel.create(data2.insertId, id_server)
+                .then(data => resolve(data2))
                 .catch(err => reject(err))
             })   
             .catch(err => reject(err))
