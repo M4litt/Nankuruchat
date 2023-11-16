@@ -55,6 +55,7 @@ export class LinkerChannelMessagesModel {
             db.query(
                 `
                 SELECT 
+                    user.id,
                     user.username,
                     user.pfp,
                     message.content,
@@ -80,6 +81,7 @@ export class LinkerChannelMessagesModel {
 
                     const rows = <RowDataPacket[]> res;
                     const messages:{
+                        id:number,
                         username:string,
                         pfp:string,
                         content:string,
@@ -88,6 +90,7 @@ export class LinkerChannelMessagesModel {
 
                     rows.forEach(row => 
                         messages.push({
+                            id:           row.id,
                             username:     row.username,
                             pfp:          row.pfp,
                             content:      row.content,
