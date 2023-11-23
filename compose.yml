@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  signal:
+    image: ghcr.io/m4litt/nkc-signaling
+    container_name: nkc-signal
+    ports:
+      - "4356:4356"
+  
+  database:
+    image: mysql:8.0.35-debian
+    container_name: nkc-db
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_password
+    command: docker exec -i nkc-db sh -c 'exec mysql -uroot -p"/run/secrets/db_password"' < nkc-db-schema.sql
+    ports:
+      - "3306:3306"
+    secrets:
+      - db_password
+
+  back:
+    image: ghcr.io/m4litt/nkc-back
+    container_name: nkc-back
+    environment:
+      DB_NAME: nankuruchat
+      DB_HOST: localhost
+      DB_USER: root
+      DB_PWD: /run/secrets/db_password
+      JWT_SECRET: /run/secrets/jwt_secret
+    ports:
+      - "12471:12471"
+    secrets:
+      - db_password
+      - jwt_secret
+  
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  jwt_secret:
+    file: ./secrets/jwt_secret.txt

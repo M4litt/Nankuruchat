@@ -1,6 +1,17 @@
 # Nankuruback
 by Kali <{@}>
 
+### How to run:
+
+ - Place "nkc-db-schema.sql" (or a different schema save) and "compose.yml" in the same directory.
+ - In "directory/secrets/", create and define:
+    - db_password.txt
+    - jwt_secret.txt
+ - Log in to GHRC with docker CLI
+ - Run
+
+        docker compose up
+
 ### Status:
 - CDN-stable: **Merged**
 
