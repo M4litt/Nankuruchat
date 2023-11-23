@@ -5,8 +5,8 @@ import cors from 'cors'
 import { readFileSync } from 'fs'
 import path from 'path'
 
-const privateKey = readFileSync(require.resolve('../public/certs/key.pem'))
-const certificate = readFileSync(require.resolve('../public/certs/cert.pem'))
+const privateKey = readFileSync(require.resolve(process.env.KEY_PATH || './public/certs/key.pem'))
+const certificate = readFileSync(require.resolve(process.env.CERT_PATH || './public/certs/cert.pem'))
 const credentials = { key: privateKey, cert: certificate }
 
 const port = process.env.PORT || 4356
