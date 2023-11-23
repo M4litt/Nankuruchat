@@ -1,10 +1,11 @@
 import jwt from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
 import dotenv from 'dotenv'
+import fs from 'fs'
 
 dotenv.config()
 
-const SECRET_KEY = process.env.JWT_SECRET || 'invalid-secret';
+const SECRET_KEY = fs.readFile(process.env.JWT_SECRET!, 'utf-8', (err, data) => { data })! || 'invalid-secret';
 
 export async function auth(req:Request, res:Response, next:NextFunction)
 {

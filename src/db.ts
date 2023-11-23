@@ -1,13 +1,16 @@
 import dotenv from 'dotenv'
 import mysql from 'mysql2'
+import fs from 'fs'
 
 dotenv.config()
+
+const DB_PW = fs.readFile(process.env.DB_PWD!, 'utf-8', (err, data) => { data })
 
 export const db = mysql.createConnection(
     {
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
-        password: process.env.DB_PWD,
+        password: DB_PW!,
         database: process.env.DB_NAME,
     }
 );
