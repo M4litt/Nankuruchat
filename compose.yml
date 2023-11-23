@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   signal:
@@ -12,29 +12,37 @@ services:
     container_name: nkc-db
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_password
-    command: sh -c 'exec mysql -uroot -p"/run/secrets/db_password"' < nkc-db-schema.sql
+    volumes:
+      - ./database/dumps:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
     secrets:
       - db_password
-
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+  
   back:
     image: ghcr.io/m4litt/nkc-back
     container_name: nkc-back
     environment:
       DB_NAME: nankuruchat
-      DB_HOST: localhost
+      DB_HOST: nkc-db
       DB_USER: root
       DB_PWD: /run/secrets/db_password
       JWT_SECRET: /run/secrets/jwt_secret
     ports:
       - "12471:12471"
+    depends_on:
+      database:
+        condition: service_healthy
     secrets:
       - db_password
       - jwt_secret
-  
+
 secrets:
   db_password:
-    file: ./secrets/db_password.txt
+    file: secrets/db_password.txt
   jwt_secret:
-    file: ./secrets/jwt_secret.txt
+    file: secrets/jwt_secret.txt
