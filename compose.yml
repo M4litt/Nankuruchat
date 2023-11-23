@@ -12,7 +12,7 @@ services:
     container_name: nkc-db
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_password
-    command: docker exec -i nkc-db sh -c 'exec mysql -uroot -p"/run/secrets/db_password"' < nkc-db-schema.sql
+    command: sh -c 'exec mysql -uroot -p"/run/secrets/db_password"' < nkc-db-schema.sql
     ports:
       - "3306:3306"
     secrets:
