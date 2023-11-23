@@ -2,7 +2,7 @@ secrets/
 
 # CDN
 upload*
-data*
+data/
 
 # Logs
 logs
