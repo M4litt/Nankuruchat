@@ -5,7 +5,7 @@ import fs from 'fs'
 
 dotenv.config()
 
-const SECRET_KEY = fs.readFile(process.env.JWT_SECRET!, 'utf-8', (err, data) => { data })! || 'invalid-secret';
+const SECRET_KEY = fs.readFile('/run/secrets/jwt_secret', 'utf-8', (err, data) => { return data })! || 'invalid-secret';
 
 export async function auth(req:Request, res:Response, next:NextFunction)
 {
