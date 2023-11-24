@@ -7,6 +7,7 @@ dotenv.config()
 const DB_PW = fs.readFile(process.env.DB_PWD!, 'utf-8', (err, data) => { return data })
 
 console.log(DB_PW)
+console.log(process.env.DB_PWD)
 
 export const db = mysql.createConnection(
     {
