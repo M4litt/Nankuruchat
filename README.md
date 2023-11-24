@@ -3,8 +3,8 @@ by Kali <{@}>
 
 ### How to run:
 
- - Place "nkc-db-schema.sql" (or a different schema save) and "compose.yml" in the same directory.
- - In "directory/secrets/", create and define:
+ - Place "nkc-db-schema.sql" in /database/dumps.
+ - In "secrets/", create and define:
     - db_password.txt
     - jwt_secret.txt
  - Log in to GHRC with docker CLI
