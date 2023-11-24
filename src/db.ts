@@ -4,10 +4,10 @@ import fs from 'fs'
 
 dotenv.config()
 
-const DB_PW = fs.readFile(process.env.DB_PWD!, 'utf-8', (err, data) => { return data })
+const DB_PW = fs.readFile('/run/secrets/db_password', 'utf-8', err => { console.log(err) })
 
 console.log(DB_PW)
-console.log(process.env.DB_PWD)
+console.log(process.env.DB_PWF)
 
 export const db = mysql.createConnection(
     {
