@@ -239,6 +239,8 @@ CREATE TABLE `server` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+INSERT INTO server (name, description, picture) VALUES ("Aldea titi", "Where titi monkeys talk", "-");
+
 --
 -- Dumping data for table `server`
 --
@@ -265,6 +267,11 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+CREATE TRIGGER add_to_test_server
+AFTER INSERT ON user
+FOR EACH ROW
+INSERT INTO linker_users_server (id_user, id_server) VALUES (NEW.id, 1);
 
 --
 -- Dumping data for table `user`
