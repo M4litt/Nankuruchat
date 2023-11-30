@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import { User, UserJson } from "../types/user.type";
+import fs from 'fs'
 
 // models
 import { UserModel } from "../models/user.model";
@@ -250,9 +251,10 @@ export class UserController {
 
     private static getToken(user:User)
     {
+        const token = fs.readFileSync(process.env.JWT_SECRET!, 'utf-8')
         return jwt.sign(
             user,
-            process.env.JWT_SECRET || 'invalid-secret',
+            token || 'invalid-secret',
             {
                 expiresIn: '24h'
             }
